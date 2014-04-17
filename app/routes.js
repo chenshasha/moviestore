@@ -7,10 +7,15 @@ var User = require('../app/models/user');
 
 module.exports = function (app, passport) {
 
-    //direct to store
+    //direct to user page
     app.get('/store', function (req, res) {
-    res.render('store.ejs'); // load the index.ejs file
-});
+        res.render('store.ejs'); // load the index.ejs file
+    });
+
+    //direct to admin page
+    app.get('/adminstore', function (req, res) {
+        res.render('adminstore.ejs'); // load the index.ejs file
+    });
 
     // =====================================
     // HOME PAGE (with login links) ========
@@ -24,9 +29,13 @@ module.exports = function (app, passport) {
     // =====================================
     // show the login form
     app.get('/login', function (req, res) {
-
         // render the page and pass in any flash data if it exists
         res.render('login.ejs', { message: req.flash('loginMessage') });
+    });
+
+    app.get('/adminlogin', function (req, res) {
+        // render the page and pass in any flash data if it exists
+        res.render('adminlogin.ejs', { message: req.flash('loginMessage') });
     });
 
     // process the login form
@@ -35,6 +44,18 @@ module.exports = function (app, passport) {
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
+
+    app.post('/adminlogin', function(req, res){
+
+        if(req.param('id') == "admin" && req.param('password') == "d111111"){
+            res.redirect('/adminstore');
+        }else{
+            req.flash('loginMessage', 'Oops! Something is wrong.')
+            res.redirect('/adminlogin');
+        }
+
+    });
+
 
     // =====================================
     // SIGNUP ==============================
