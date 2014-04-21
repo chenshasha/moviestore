@@ -5,7 +5,7 @@ var LocalStrategy   = require('passport-local').Strategy;
 
 // load up the user model
 var User       		= require('../app/models/user');
-//var Books           = require('../app/models/book');
+
 
 
 // expose this function to our app using module.exports
@@ -61,11 +61,13 @@ module.exports = function(passport) {
 
                 // set the user's local credentials
                 newUser.local.email      = email;
+                newUser.local.userType   = 's';
                 newUser.local.password   = newUser.generateHash(password); // use the generateHash function in our user model
                 newUser.local.lastDate   = new Date();
                 newUser.local.today      = new Date();
                 newUser.local.firstName  = req.param('fname');
                 newUser.local.lastName   = req.param('lname');
+
 
 				// save the user
                 newUser.save(function(err) {
@@ -122,7 +124,5 @@ module.exports = function(passport) {
         });
 
     }));
-
-
 
 };

@@ -10,8 +10,6 @@ var passport = require('passport');
 var flash = require('connect-flash');
 
 
-
-
 require('./config/passport')(passport); // pass passport for configuration
 
 
@@ -30,7 +28,14 @@ app.configure(function () {
     app.use(passport.session()); // persistent login sessions
     app.use(flash()); // use connect-flash for flash messages stored in session
 
+    //header path
+    var path    = require( 'path' );
+    app.use( express.static( path.join( __dirname, 'public' )));
+
 });
+
+
+
 
 
 // routes ======================================================================
