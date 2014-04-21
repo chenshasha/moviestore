@@ -47,7 +47,7 @@ module.exports = function (app, passport) {
 
     app.post('/adminlogin', function(req, res){
 
-        if(req.param('id') == "admin" && req.param('password') == "d111111"){
+        if(req.param('id') == "admin" && req.param('password') == "admin"){
             res.redirect('/adminstore');
         }else{
             req.flash('loginMessage', 'Oops! Something is wrong.')
