@@ -30,14 +30,20 @@ module.exports = function (app, passport) {
         var newUser            = new User();
         // set the user's local credentials
         newUser.local.email      = req.param('email');
-        newUser.local.lastDate   = new Date();
-        newUser.local.today      = new Date();
         newUser.local.firstName  = req.param('firstName');
         newUser.local.lastName   = req.param('lastName');
         newUser.local.phone      = req.param('phone');
         newUser.local.address    = req.param('address');
         newUser.local.password   = newUser.generateHash(req.param('password'));
+        newUser.local.createDate = new Date();
         newUser.local.userType   = req.param('userType');
+        newUser.local.expireDate = new Date();
+        if(req.param('userType') == "Simple"){
+            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
+        }else{
+            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+31);
+        }
+
         newUser.save();
         var pathName = '/profile/'+ req.param('email');
         res.redirect(pathName);
