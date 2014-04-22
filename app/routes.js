@@ -145,7 +145,7 @@ module.exports = function (app, passport) {
     });
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({"MovieName": req.params.id}, function (err,movies) {
+        Movie.findOne({id: req.params.id}, function (err,movies) {
               if (err) {};
               res.render('viewMoviePage.ejs', {movies: movies});
 
