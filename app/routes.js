@@ -1,7 +1,7 @@
 // app/routes.js
 
 var User = require('../app/models/user');
-
+var Movie = require('../app/models/movie');
 
 
 
@@ -59,6 +59,26 @@ module.exports = function (app, passport) {
 
             });
     });
+    
+    //view all movies
+    app.get('/movieall', isLoggedIn, function (req, res) {	
+    	var twisted = function(res){
+            return function(err, movie){
+                if (err){
+                    console.log('error occured');
+                    return;
+                }
+                res.render('movie.ejs', {movie: movie});
+            }
+        }
+
+        Movie.find({}, twisted(res));    	
+    });
+    app.post('/movieall', isLoggedIn, function (req, res) {
+        res.redirect('/movieall');
+
+    });
+    
 
     //member view profile
     app.get('/profile-view-only', isLoggedIn, function (req, res) {
