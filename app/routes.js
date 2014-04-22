@@ -3,7 +3,7 @@
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
-
+GLOBAL.count=0;
 
 module.exports = function (app, passport) {
 
@@ -80,7 +80,8 @@ module.exports = function (app, passport) {
                     console.log('error occured');
                     return;
                 }
-                res.render('movie.ejs', {movie: movie});
+                GLOBAL.count=GLOBAL.count+1;
+                res.render('movie.ejs', {movie: movie, count: GLOBAL.count});
             }
         }
 

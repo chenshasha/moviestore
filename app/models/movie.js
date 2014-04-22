@@ -10,22 +10,27 @@ lineList.shift(); // Shift the headings off the list of records.
 
 var schemaKeyList = ['id', 'MovieName', 'MovieBanner', 'ReleaseDate', 'RentAmt','AvlCopies','category'];
 
-
-
 // define the schema for our user model
-var movieSchema = new mongoose.Schema({
+var movieSchema = mongoose.Schema({
         id        	 : Number,
         MovieName    : String,
         MovieBanner  : String,
-        ReleaseDate  : Date,
+        ReleaseDate  : Number,
         RentAmt   	 : Number,
         AvlCopies    : Number,
         category     : String
 });
 
 var RepOppDoc = mongoose.model('Movie', movieSchema);
-RepOppDoc.collection.drop();
 console.log('Database loading started');
+
+RepOppDoc.collection.remove(function(err, p){
+    if(err){ 
+        throw err;
+    }
+});
+
+
 function createDocRecurse (err) {
     if (err) {
         console.log(err);
