@@ -13,7 +13,7 @@ var schemaKeyList = ['id', 'MovieName', 'MovieBanner', 'ReleaseDate', 'RentAmt',
 
 
 // define the schema for our user model
-var movieSchema = new mongoose.Schema({
+var movieSchema = mongoose.Schema({
         id        	 : Number,
         MovieName    : String,
         MovieBanner  : String,
@@ -24,8 +24,9 @@ var movieSchema = new mongoose.Schema({
 });
 
 var RepOppDoc = mongoose.model('Movie', movieSchema);
-RepOppDoc.collection.drop();
 console.log('Database loading started');
+
+
 function createDocRecurse (err) {
     if (err) {
         console.log(err);
