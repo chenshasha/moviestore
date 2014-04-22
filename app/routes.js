@@ -70,6 +70,21 @@ module.exports = function (app, passport) {
     });
 
 
+    //view all members
+    app.get('/searchMember', function(req, res) {
+
+        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
+            if (err) {
+            }
+            ;
+            res.render('searchMember.ejs', {
+                users: users
+            });
+        });
+
+    });
+
+
 
     //direct to user page
     app.get('/store', isLoggedIn, function (req, res) {
