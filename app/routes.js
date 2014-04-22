@@ -7,6 +7,52 @@ var User = require('../app/models/user');
 
 module.exports = function (app, passport) {
 
+
+    //Member Management
+    //add new member
+    app.get('/addMember', isLoggedIn, function (req, res) {
+        res.render('addmember.ejs'); // load the index.ejs file
+    });
+    app.post('/addMember', isLoggedIn, function (req, res) {
+        var newUser            = new User();
+        // set the user's local credentials
+        newUser.local.email      = req.param('email');
+        newUser.local.lastDate   = new Date();
+        newUser.local.today      = new Date();
+        newUser.local.firstName  = req.param('firstName');
+        newUser.local.lastName   = req.param('lastName');
+        newUser.local.phone      = req.param('phone');
+        newUser.local.address    = req.param('address');
+        newUser.local.password   = newUser.generateHash(req.param('password'));
+        newUser.local.userType   = req.param('userType');
+        newUser.save();
+        var pathName = '/profile/'+ req.param('email');
+        res.redirect(pathName);
+
+    });
+
+    //view individual profile
+    app.get('/profile/:id', isLoggedIn, function (req, res) {
+
+
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            if (err) {
+            };
+            console.log(user.local.email);
+            res.render('profile.ejs', {
+                user: user
+            });
+        });
+    });
+
+    //delete individual member
+    app.get('/destroy/:id', isLoggedIn, function (req, res) {
+        User.remove({"local.email": req.params.id}).exec();
+        res.redirect('/adminstore');
+    });
+
+
+
     //direct to user page
     app.get('/store', isLoggedIn, function (req, res) {
         res.render('store.ejs'); // load the index.ejs file
