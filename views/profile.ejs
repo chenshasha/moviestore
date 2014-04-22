@@ -38,9 +38,9 @@
 
                 </tbody>
             </table>
-            <a href="/modifyprofile" class="btn btn-primary">Modify Profile  </a>
+            <a href="/modifyprofile/<%= user.local.email %>" class="btn btn-primary">Modify Profile  </a>
 
-            <a href="/destroy/<%= user.local.email %>"  class="btn btn-default">Delete Member</a>
+            <a href="/destroy/<%= user.local.email %>"  class="btn btn-primary">Delete Member</a>
             </div>
     </form>
 

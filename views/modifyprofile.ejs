@@ -1,0 +1,41 @@
+<%- include adminheader %>
+
+
+<div style="padding:30px">
+</div>
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+    </div>
+</div>
+
+
+<form action="/modifyprofile/<%= user.local.email %>" method="post" accept-charset="utf-8">
+    <div class="col-md-6 col-md-offset-3">
+        <table class="table table-bordered">
+            <tbody style="text-align:left;">
+            <tr>
+                <th style="width: 150px;">Email: </th>
+                <td><%= user.local.email %><br></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">First Name: </th>
+                <td><input class="form-control" name="firstName" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Last Name: </th>
+                <td><input class="form-control" name="lastName" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Phone Number: </th>
+                <td><input class="form-control" name="phone" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Address: </th>
+                <td><input class="form-control" name="address" size = "50" data-type="text" data-placement="right" required></a></td>
+            </tr>
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="/profile/<%= user.local.email %>" class="btn btn-primary">Cancel  </a>
+</form>

@@ -38,7 +38,7 @@ module.exports = function (app, passport) {
         User.findOne({"local.email": req.params.id}, function (err, user) {
             if (err) {
             };
-            console.log(user.local.email);
+            //console.log(user.local.email);
             res.render('profile.ejs', {
                 user: user
             });
@@ -49,6 +49,24 @@ module.exports = function (app, passport) {
     app.get('/destroy/:id', isLoggedIn, function (req, res) {
         User.remove({"local.email": req.params.id}).exec();
         res.redirect('/adminstore');
+    });
+
+    //modify profile
+    app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            if (err) {
+            };
+            res.render('modifyprofile.ejs', {
+                user: user
+            });
+        });
+    });
+
+    app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
+        User.update({"local.email": req.params.id},{"local.firstName": req.param('firstName'), "local.lastName":req.param('lastName'),
+            "local.address":req.param('address'), "local.phone":req.param('phone')}).exec();
+        var pathName = '/profile/'+ req.params.id;
+        res.redirect(pathName);
     });
 
 
