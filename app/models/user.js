@@ -12,7 +12,10 @@ var userSchema = mongoose.Schema({
         lastDate     : Date,
         today        : Date,
         firstName    : String,
-        lastName     : String
+        lastName     : String,
+        phone        : String,
+        address      : String
+
     }
 
 });
