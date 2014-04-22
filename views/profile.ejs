@@ -36,11 +36,25 @@
                     <td><%= user.local.userType %></td>
                 </tr>
 
+                <tr>
+                    <th style="width: 150px;">Membership Start Date: </th>
+                    <td><%= user.local.createDate %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership Expire Date: </th>
+                    <td><%= user.local.expireDate %></td>
+                </tr>
+
                 </tbody>
             </table>
             <a href="/modifyprofile/<%= user.local.email %>" class="btn btn-primary">Modify Profile  </a>
 
             <a href="/destroy/<%= user.local.email %>"  class="btn btn-primary">Delete Member</a>
+
+            <a href="/upgrade/<%= user.local.email %>" class="btn btn-primary">Upgrade Membership  </a>
+
+
             </div>
     </form>
 

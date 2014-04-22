@@ -9,6 +9,19 @@ module.exports = function (app, passport) {
 
 
     //Member Management
+    //member upgrade
+    app.get('/upgrade/:id', isLoggedIn, function (req, res) {
+
+        var memberDay = new Date();
+        memberDay.setDate(memberDay.getDate()+31)
+        User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
+            "local.expireDate":memberDay}).exec();
+        var pathName = '/profile/'+ req.params.id;
+        res.redirect(pathName);
+    });
+
+
+
     //add new member
     app.get('/addMember', isLoggedIn, function (req, res) {
         res.render('addmember.ejs'); // load the index.ejs file
@@ -31,7 +44,17 @@ module.exports = function (app, passport) {
 
     });
 
+
     //view individual profile
+    app.get('/profile/:id', isLoggedIn, function (req, res) {
+         User.findOne({"local.email": req.params.id}, function (err, user) {
+              if (err) {};
+              res.render('profile.ejs', {user: user});
+
+            });
+    });
+
+    //member view profile
     app.get('/profile-view-only', isLoggedIn, function (req, res) {
         User.findOne({user_id: req.user.id}, function(err, user) {
             res.render('profile-view-only.ejs', {
@@ -143,7 +166,7 @@ module.exports = function (app, passport) {
 
     // process the signup form
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/store', // redirect to the secure profile section
+        successRedirect: '/profile-view-only', // redirect to the secure profile section
         failureRedirect: '/signup', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
