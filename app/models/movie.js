@@ -15,7 +15,7 @@ var movieSchema = mongoose.Schema({
         id        	 : Number,
         MovieName    : String,
         MovieBanner  : String,
-        ReleaseDate  : Date,
+        ReleaseDate  : Number,
         RentAmt   	 : Number,
         AvlCopies    : Number,
         category     : String
