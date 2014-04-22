@@ -50,7 +50,19 @@ module.exports = function (app, passport) {
 
     });
 
+//****************************************************************
+    //add new member
+    app.get('/createMovie', isLoggedIn, function (req, res) {
+        res.render('createMovie.ejs'); // load the createMovie.ejs file
+    });
+    app.post('/createMovie', isLoggedIn, function (req, res) {
+        var newUser            = new User();
+        // definition pending
 
+    });
+
+    
+ //***************************************************************   
     //view individual profile
     app.get('/profile/:id', isLoggedIn, function (req, res) {
          User.findOne({"local.email": req.params.id}, function (err, user) {
@@ -112,7 +124,35 @@ module.exports = function (app, passport) {
         var pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
     });
+//*******************************************
+    app.get('/searchMovie', isLoggedIn, function (req, res) {	
+    	var twisted = function(res){
+            return function(err, movies){
+                if (err){
+                    console.log('error occured');
+                    return;
+                }
+                res.render('searchMovie.ejs', {movies: movies});
+            }
+        }
 
+        Movie.find({}, twisted(res));    	
+    });
+    app.post('/searchMovie', isLoggedIn, function (req, res) {
+        res.redirect('/searchMovie');
+
+    });
+    //view individual movie
+    app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
+        Movie.findOne({"MovieName": req.params.id}, function (err,movies) {
+              if (err) {};
+              res.render('viewMoviePage.ejs', {movies: movies});
+
+            });
+    });
+
+ 
+ //********************************************   
 
     //view all members
     app.get('/searchMember', function(req, res) {

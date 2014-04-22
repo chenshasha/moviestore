@@ -1,0 +1,22 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Search Movies</h1>
+    </div>
+
+
+    <% movies.forEach( function ( movies ){ %>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <a href="/viewMoviePage/<%= movies.id %>"><h3 class="panel-title"><%= movies.MovieName %></h3> </a>
+        </div>
+       <div class="panel-body">
+            <div>ID: <%= movies.id %></div>
+            </div>
+
+<% }); %>
