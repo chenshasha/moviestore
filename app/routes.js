@@ -32,15 +32,10 @@ module.exports = function (app, passport) {
     });
 
     //view individual profile
-    app.get('/profile/:id', isLoggedIn, function (req, res) {
-
-
-        User.findOne({"local.email": req.params.id}, function (err, user) {
-            if (err) {
-            };
-            //console.log(user.local.email);
-            res.render('profile.ejs', {
-                user: user
+    app.get('/profile-view-only', isLoggedIn, function (req, res) {
+        User.findOne({user_id: req.user.id}, function(err, user) {
+            res.render('profile-view-only.ejs', {
+                user : req.user
             });
         });
     });
@@ -84,6 +79,9 @@ module.exports = function (app, passport) {
 
     });
 
+    //view profile-view-only
+
+
 
 
     //direct to user page
@@ -119,7 +117,7 @@ module.exports = function (app, passport) {
 
     // process the login form
     app.post('/login', passport.authenticate('local-login', {
-        successRedirect: '/store', // redirect to the secure profile section
+        successRedirect: '/profile-view-only', // redirect to the secure profile section
         failureRedirect: '/login', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
