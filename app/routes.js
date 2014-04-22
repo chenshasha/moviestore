@@ -8,12 +8,12 @@ var User = require('../app/models/user');
 module.exports = function (app, passport) {
 
     //direct to user page
-    app.get('/store', function (req, res) {
+    app.get('/store', isLoggedIn, function (req, res) {
         res.render('store.ejs'); // load the index.ejs file
     });
 
     //direct to admin page
-    app.get('/adminstore', function (req, res) {
+    app.get('/adminstore', isLoggedIn, function (req, res) {
         res.render('adminstore.ejs'); // load the index.ejs file
     });
 
@@ -45,16 +45,13 @@ module.exports = function (app, passport) {
         failureFlash: true // allow flash messages
     }));
 
-    app.post('/adminlogin', function(req, res){
+    app.post('/adminlogin', passport.authenticate('local-login',{
 
-        if(req.param('id') == "admin" && req.param('password') == "admin"){
-            res.redirect('/adminstore');
-        }else{
-            req.flash('loginMessage', 'Oops! Something is wrong.')
-            res.redirect('/adminlogin');
-        }
+        successRedirect: '/adminstore', // redirect to the secure profile section
+        failureRedirect: '/adminlogin', // redirect back to the signup page if there is an error
+        failureFlash: true // allow flash messages
 
-    });
+    }));
 
 
     // =====================================
@@ -81,7 +78,7 @@ module.exports = function (app, passport) {
     // =====================================
     app.get('/logout', function (req, res) {
         req.logout();
-        req.session.destroy();
+        //req.session.destroy();
         res.redirect('/');
 
     });
