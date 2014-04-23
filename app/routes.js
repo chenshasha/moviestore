@@ -51,13 +51,34 @@ module.exports = function (app, passport) {
     });
 
 //****************************************************************
-    //add new member
+    //Create New Movie
+    
     app.get('/createMovie', isLoggedIn, function (req, res) {
-        res.render('createMovie.ejs'); // load the createMovie.ejs file
+    	res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
-        var newUser            = new User();
-        // definition pending
+    	var newMovie            = new Movie();
+    	//var total=Movie.count({ id: { $exists: true } });
+    	
+
+    	
+    	
+
+    	newMovie .id      		= Math.random();           //temporary solution
+    	newMovie .MovieName  	= req.param('movie_name');
+    	newMovie .MovieBanner  	= req.param('banner');
+    	newMovie .ReleaseDate   = req.param('releaseDate');
+    	newMovie .RentAmt  		= req.param('rentAmount');
+    	newMovie .AvlCopies  	= req.param('availableCopies');
+    	newMovie.category 		= req.param('category');
+
+    	if(req.param('category') == "Other"){
+    		newMovie.category = req.param('other');
+    	}
+
+    	newMovie.save();
+    	var pathName = '/viewMoviePage/'+ newMovie.id;
+    	res.redirect(pathName);
 
     });
 

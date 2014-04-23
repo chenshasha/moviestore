@@ -3,7 +3,7 @@
 var mongoose = require('mongoose');
 GLOBAL.j=0;
 
-
+GLOBAL.total=0;
 var fs = require('fs');
 var lineList = fs.readFileSync('movies1.csv').toString().split('\n');
 lineList.shift(); // Shift the headings off the list of records.
