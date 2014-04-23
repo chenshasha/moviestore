@@ -1,0 +1,81 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Create Movie</h1>
+    </div>
+
+
+
+<form action="/createMovie" method="post" accept-charset="utf-8">
+    <div class="col-md-6 col-md-offset-3">
+        <table class="table table-bordered table-hover">
+            <tbody style="text-align:left;">
+            <tr>
+                <th style="width: 150px;">Movie Name: </th>
+                <td><input class="form-control" name="movie_name" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Banner: </th>
+                <td><input class="form-control" name="banner" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+
+            <tr>
+                <th style="width: 150px;">Release Date: </th>
+                <td><input class="form-control" name="releaseDate" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Rent Amount: </th>
+                <td><input class="form-control" name="rentAmount" size = "50" data-type="text" data-placement="right" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Category: </th>
+                <td><select class="form-control" id="category"
+                        name="category"  onchange="enable();">
+                    <option value="" selected="selected">select category</option>
+                    <option value="drama">Drama</option>
+                    <option value="comedy">Comedy</option>
+                    <option value="biography">Biography</option>
+                    <option value="adventure">Adventure</option>
+                    <option value="music">Music</option>
+                    <option value="thriller">Thriller</option>
+                    <option value="history">History</option>
+                    <option value="reality">Reality-TV</option>
+                    <option value="family">Family</option>
+                    <option value="animation">Animation</option>
+                    <option value="other">Other</option>
+
+                </select>
+                </td>
+            </tr>
+            <tr>
+            <td></td><td><input class="form-control" disabled="true"  name="other" id="other" size = "50" data-type="text" data-placement="right" required></a></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Available Copies: </th>
+                <td><input class="form-control" name="availableCopies" size = "50" data-type="text" data-placement="right" required></a></td>
+            </tr>
+           
+            </tr>
+
+
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+</form>
+    </div>
+    
+    
+    <script type="text/javascript">
+function enable() {
+    if (document.getElementById("category").value != "other"){
+        document.getElementById("other").disabled = true;
+    }     
+    else{
+        document.getElementById("other").disabled = false;
+    }        
+}
+</script>

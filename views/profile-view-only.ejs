@@ -1,0 +1,57 @@
+<%- include memberheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+
+    <div class="page-header text-center">
+
+        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+    </div>
+
+
+    <form >
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+                <tr>
+                    <th style="width: 150px;">Email: </th>
+                    <td><%= user.local.email %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Name: </th>
+                    <td><%= user.local.firstName %> <%= user.local.lastName %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Phone Number: </th>
+                    <td><%= user.local.phone %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Address: </th>
+                    <td><%= user.local.address %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership: </th>
+                    <td><%= user.local.userType %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership Start Date: </th>
+                    <td><%= user.local.createDate %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership Expire Date: </th>
+                    <td><%= user.local.expireDate %></td>
+                </tr>
+
+                </tbody>
+            </table>
+            </div>
+    </form>
+
+
+</div>
+
+

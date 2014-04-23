@@ -1,0 +1,61 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+<% var min,max;
+				max=count*100;
+				min=max-100; %>
+<div class="container">
+	<form action="/movieall">
+    <div class="page-header text-center">
+
+        <h1><span class="fa fa-anchor"></span> All Movies <%=movie.length%> </h1>
+        Showing <%=min%> to <%=max%> <button type="submit" class="btn btn-default btn-lg active">NEXT >></button>
+    </div>
+
+
+    
+   
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+                <tr>
+                	<th style="width: 150px;">ID </th>
+                	<th style="width: 150px;">MovieName </th>
+                	<th style="width: 150px;">MovieBanner </th>
+                	<th style="width: 150px;">ReleaseDate </th>
+                	<th style="width: 150px;">RentAmt </th>
+                	<th style="width: 150px;">AvlCopies </th>
+                	<th style="width: 150px;">Category </th>
+                </tr>
+                
+                <%
+				for(var k=min; k<max; k++) {%>
+    
+                <tr>
+                    <td><%= movie[k].id %><br></td>   
+                                     
+                    <td><%= movie[k].MovieName %></td>
+                
+                    <td><%= movie[k].MovieBanner %><br></td>
+               
+                    <td><%= movie[k].ReleaseDate %></td>
+                
+                    <td><%= movie[k].RentAmt %></td>
+                
+                    <td><%= movie[k].AvlCopies %></td>
+                    
+                    <td><%= movie[k].category %></td>
+                </tr>
+                
+                <% } %>
+
+                </tbody>
+            </table>
+
+            </div>
+    </form>
+
+
+</div>
+
+

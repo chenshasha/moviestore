@@ -1,0 +1,24 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Search Members</h1>
+    </div>
+
+
+    <% users.forEach( function ( user ){ %>
+
+    <div class="panel panel-default">
+
+        <div class="panel-heading">
+            <a href="/profile/<%= user.local.email %>"><h3 class="panel-title"><%= user.local.email %></h3> </a>
+        </div>
+        <div class="panel-body">
+            <div>Name: <%= user.local.firstName %> <%= user.local.lastName %></div>
+            <div>Membership: <%= user.local.userType %></div>
+        </div>
+    </div>
+
+<% }); %>
