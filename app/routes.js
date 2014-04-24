@@ -58,13 +58,12 @@ module.exports = function (app, passport) {
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
     	var newMovie            = new Movie();
-    	//var total=Movie.count({ id: { $exists: true } });
-    	
-
-    	
-    	
-
-    	newMovie .id      		= Math.random();           //temporary solution
+    	Movie.count({ id: { $exists: true } },function(err,count)
+    	{if(err)
+    		{
+    		
+    		}
+    	newMovie .id      		= count+1;           //temporary solution
     	newMovie .MovieName  	= req.param('movie_name');
     	newMovie .MovieBanner  	= req.param('banner');
     	newMovie .ReleaseDate   = req.param('releaseDate');
@@ -79,6 +78,14 @@ module.exports = function (app, passport) {
     	newMovie.save();
     	var pathName = '/viewMoviePage/'+ newMovie.id;
     	res.redirect(pathName);
+    	
+    	});
+    	
+
+    	
+    	
+
+    	
 
     });
 
