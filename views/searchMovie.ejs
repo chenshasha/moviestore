@@ -7,17 +7,21 @@
         <h1><span class="fa fa-anchor"></span> Search Movies</h1>
     </div>
 
+<form class="form-inline" role="form" method="post" action="/searchMovie">
+  <div class="form-group">
+    <label class="sr-only" for="exampleInputEmail2">Search String</label>
+    <input type="text" class="form-control" placeholder="Enter Search String" id="str" name="str">
+  </div>
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+<br>
 
     <% movies.forEach( function ( movies ){ %>
 
     <div class="panel panel-default">
-
         <div class="panel-heading">
             <a href="/viewMoviePage/<%= movies.id %>"><h3 class="panel-title"> <%= movies.MovieName %></h3> </a>
             <div>Id: <%= movies.id %></div>
-        </div>
-      
-           
-            
-
+        </div>        
+	</div>
 <% }); %>
