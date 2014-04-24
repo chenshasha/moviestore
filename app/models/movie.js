@@ -8,7 +8,7 @@ var fs = require('fs');
 var lineList = fs.readFileSync('movies1.csv').toString().split('\n');
 lineList.shift(); // Shift the headings off the list of records.
 
-var schemaKeyList = ['id', 'MovieName', 'MovieBanner', 'ReleaseDate', 'RentAmt','AvlCopies','category'];
+var schemaKeyList = ['id','MovieName', 'MovieBanner', 'ReleaseDate', 'RentAmt','AvlCopies','category'];
 
 // define the schema for our user model
 var movieSchema = mongoose.Schema({

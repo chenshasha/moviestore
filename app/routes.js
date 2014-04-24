@@ -58,37 +58,32 @@ module.exports = function (app, passport) {
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
     	var newMovie            = new Movie();
-    	Movie.count({ id: { $exists: true } },function(err,count)
-    	{if(err)
-    		{
-    		
-    		}
-    	newMovie .id      		= count+1;           //temporary solution
-    	newMovie .MovieName  	= req.param('movie_name');
-    	newMovie .MovieBanner  	= req.param('banner');
-    	newMovie .ReleaseDate   = req.param('releaseDate');
-    	newMovie .RentAmt  		= req.param('rentAmount');
-    	newMovie .AvlCopies  	= req.param('availableCopies');
-    	newMovie.category 		= req.param('category');
+    	var total=0;
+    	
+    	Movie.count({id:{$exists:true}},function(err,count){
+    	
+    newMovie.id				= count+1;
+	newMovie .MovieName  	= req.param('movie_name');
+	newMovie .MovieBanner  	= req.param('banner');
+	newMovie .ReleaseDate   = req.param('releaseDate');
+	newMovie .RentAmt  		= req.param('rentAmount');
+	newMovie .AvlCopies  	= req.param('availableCopies');
+	newMovie.category 		= req.param('category');
 
-    	if(req.param('category') == "Other"){
-    		newMovie.category = req.param('other');
-    	}
-
+	if(req.param('category') === "Other"){
+		newMovie.category = req.param('other');
+	}
+ 
+    
     	newMovie.save();
-    	var pathName = '/viewMoviePage/'+ newMovie.id;
+    	console.log(newMovie._id);
+    	
+    	var pathName = '/viewMoviePage/'+ newMovie._id;
     	res.redirect(pathName);
-    	
     	});
-    	
-
-    	
-    	
-
-    	
-
-    });
-
+        });
+//***************************************************************
+    
     
  //***************************************************************   
     //view individual profile
@@ -188,7 +183,7 @@ module.exports = function (app, passport) {
     
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({id: req.params.id}, function (err,movies) {
+        Movie.findOne({_id: req.params.id}, function (err,movies) {
               if (err) {};
               res.render('viewMoviePage.ejs', {movies: movies});
 
