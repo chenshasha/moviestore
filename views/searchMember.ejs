@@ -7,6 +7,24 @@
         <h1><span class="fa fa-anchor"></span> Search Members</h1>
     </div>
 
+	<h4> Search Based on Attributes </h4>
+	<form class="form-inline" role="form" method="post" action="/searchMember">
+ 		<select class="form-control" id="searchparam" name="searchparam">
+                    <option value="email">Email</option>
+                    <option value="firstName">First Name</option>
+                    <option value="lastName">Last Name</option>
+                    <option value="phone">Phone Number</option>
+                    <option value="address">Address</option>
+                    <option value="userType">Membership</option>
+  		</select>
+  		<div class="form-group">
+   			<label class="sr-only">Search String</label>
+   			<input type="text" class="form-control" placeholder="Enter Search String" id="str" name="str">
+ 		</div>
+ 		<button type="submit" class="btn btn-primary">Search</button>
+	</form>
+
+	<br>
 
     <% users.forEach( function ( user ){ %>
 
@@ -15,10 +33,34 @@
         <div class="panel-heading">
             <a href="/profile/<%= user.local.email %>"><h3 class="panel-title"><%= user.local.email %></h3> </a>
         </div>
-        <div class="panel-body">
-            <div>Name: <%= user.local.firstName %> <%= user.local.lastName %></div>
-            <div>Membership: <%= user.local.userType %></div>
-        </div>
+               
+        <table class="table table-bordered table-hover">
+            	<tbody style="text-align:left;">
+            		<tr>
+                		<th style="width: 150px;">Name: </th>
+                		<td><%= user.local.firstName %> <%= user.local.lastName %></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 150px;">Phone Number: </th>
+                		<td> <%= user.local.phone %></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 150px;">Address: </th>
+                		<td> <%= user.local.address %></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 150px;">Membership: </th>
+                		<td> <%= user.local.userType %></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 150px;">Expire Date: </th>
+                		<td> <%= user.local.expireDate %></td>
+            		</tr>
+            	</tbody>
+            </table>
+
     </div>
 
-<% }); %>
+	<% }); %>
+</div>
+	

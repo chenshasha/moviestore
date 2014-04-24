@@ -11,8 +11,7 @@ module.exports = function (app, passport) {
 //****************************************************************
 // Member Management
 //****************************************************************
-    //change Membership	
-	//Simple User: 1 year validation, Premium User: 1 month validation
+    //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
     app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
         var memberDay = new Date();
@@ -121,6 +120,28 @@ module.exports = function (app, passport) {
         });
 
     });
+    
+    //search members based on attributes
+    app.post('/searchMember', isLoggedIn, function (req, res) {	
+    	
+    	var name = 'local.' + req.param('searchparam');
+    	var value = {'$regex': req.param('str'), $options: 'i'};
+    	var query = {};
+    	query[name] = value;
+    	
+    	console.log(query);
+    	
+    	User.find(query, function (err, users) {
+    		if (err) {
+            }
+            ;
+            res.render('searchMember.ejs', {
+                users: users
+            });
+        });
+
+    });
+    
     
     
     

@@ -2,44 +2,70 @@
 
 <%- include adminheader %>
 
-<div style="padding:80px">
+<div style="padding:30px">
 </div>
 
-<div>
-    Yes. you are admin
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Admin Panel</h1>
+    </div>
+
+    <!-- Nav tabs -->
+	<ul class="nav nav-tabs">
+	 	<li class="active"><a href="#members" data-toggle="tab">Members</a></li>
+	  	<li><a href="#movies" data-toggle="tab">Movies</a></li>
+	  	<li><a href="#transactions" data-toggle="tab">Transactions</a></li>
+	</ul>
+
+	<!-- Tab panes -->
+	<div class="tab-content">
+	  	<div class="tab-pane active" id="members">
+			<br>
+			<table class="table table-bordered table-hover">
+            	<tbody style="text-align:left;">
+            		<tr>
+                		<th style="width: 250px;">Number of Premium Member: </th>
+                		<td></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 250px;">Number of Simple Member: </th>
+                		<td></td>
+            		</tr>
+            	</tbody>
+            </table>
+	 	</div>
+	  	<div class="tab-pane active" id="movies">
+			<br>
+			<table class="table table-bordered table-hover">
+            	<tbody style="text-align:left;">
+            		<tr>
+                		<th style="width: 250px;">Total Number of Movies: </th>
+                		<td></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 250px;">Number of Issued Movies: </th>
+                		<td></td>
+            		</tr>
+            	</tbody>
+            </table>
+		
+		</div>
+	  	<div class="tab-pane active" id="transactions">
+			<br>
+			<table class="table table-bordered table-hover">
+            	<tbody style="text-align:left;">
+            		<tr>
+                		<th style="width: 250px;">Number of Ongoing: </th>
+                		<td></td>
+            		</tr>
+            		<tr>
+                		<th style="width: 250px;">Number of Completed: </th>
+                		<td></td>
+            		</tr>
+            	</tbody>
+            </table>
+		</div>
+	</div>
+    
+    
 </div>
-
-<div>
-    Sample Bootstrap code
-</div>
-
-
-<button type="button" class="btn btn-default">Left</button>
-
-
-<span class="label label-primary">Primary</span>
-
-<form role="form">
-    <div class="form-group">
-        <label for="exampleInputEmail1">Email address</label>
-        <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
-    </div>
-    <div class="form-group">
-        <label for="exampleInputPassword1">Password</label>
-        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-    </div>
-    <div class="form-group">
-        <label for="exampleInputFile">File input</label>
-        <input type="file" id="exampleInputFile">
-        <p class="help-block">Example block-level help text here.</p>
-    </div>
-    <div class="checkbox">
-        <label>
-            <input type="checkbox"> Check me out
-        </label>
-    </div>
-    <button type="submit" class="btn btn-default">Submit</button>
-</form>
-
-
-<input type="text" class="form-control" placeholder="Text input">
