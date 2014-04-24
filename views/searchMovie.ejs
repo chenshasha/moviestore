@@ -6,12 +6,22 @@
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Search Movies</h1>
     </div>
-
+<label> Search Attribute </label>
 <form class="form-inline" role="form" method="post" action="/searchMovie">
+  <select class="form-control" id="searchparam" name="searchparam">
+                    <option value="id">id</option>
+                    <option value="MovieName">MovieName</option>
+                    <option value="MovieBanner">MovieBanner</option>
+                    <option value="ReleaseDate">ReleaseDate</option>
+                    <option value="RentAmt">RentAmt</option>
+                    <option value="AvlCopies">AvlCopies</option>
+                    <option value="category">category</option>
+  </select> &nbsp&nbsp&nbsp&nbsp
   <div class="form-group">
-    <label class="sr-only" for="exampleInputEmail2">Search String</label>
+    <label class="sr-only">Search String</label>
     <input type="text" class="form-control" placeholder="Enter Search String" id="str" name="str">
   </div>
+  &nbsp&nbsp&nbsp&nbsp
   <button type="submit" class="btn btn-primary">Search</button>
 </form>
 <br>
