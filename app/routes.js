@@ -170,9 +170,9 @@ module.exports = function (app, passport) {
     	var query = {};
     	query[name] = value;
     	console.log(query);
-    	Movie.find(query, twisted(res));
-        //Movie.find({"MovieName":{'$regex': req.param('str'),$options: 'i'}}, twisted(res));    	
+    	Movie.find(query, twisted(res));  	
     });
+    
     app.get('/searchMovie', isLoggedIn, function (req, res) {
     	var twisted = function(res){
             return function(err, movies){
@@ -185,6 +185,7 @@ module.exports = function (app, passport) {
         }
         Movie.find({}, twisted(res));  
     });
+    
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
         Movie.findOne({id: req.params.id}, function (err,movies) {
