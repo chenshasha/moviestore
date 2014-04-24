@@ -147,7 +147,7 @@ module.exports = function (app, passport) {
         res.redirect(pathName);
     });
 //*******************************************
-    app.get('/searchMovie', isLoggedIn, function (req, res) {	
+    app.post('/searchMovie', isLoggedIn, function (req, res) {	
     	var twisted = function(res){
             return function(err, movies){
                 if (err){
@@ -157,11 +157,21 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-
-        Movie.find({}, twisted(res));    	
+        Movie.find({"MovieName":{'$regex': req.param('str'),'$options': 'i'}}, twisted(res));    	
     });
-    app.post('/searchMovie', isLoggedIn, function (req, res) {
-        res.redirect('/searchMovie');
+    app.get('/searchMovie', isLoggedIn, function (req, res) {
+        //res.redirect('/searchMovie');
+    	var twisted = function(res){
+            return function(err, movies){
+                if (err){
+                    console.log('error occured');
+                    return;
+                }
+                res.render('searchMovie.ejs', {movies: movies});
+            }
+        }
+    	console.log(req.param('str'));
+        Movie.find({MovieName:'a'}, twisted(res));  
 
     });
     //view individual movie
