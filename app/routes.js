@@ -157,7 +157,7 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-        Movie.find({"MovieName":{'$regex': req.param('str'),'$options': 'i'}}, twisted(res));    	
+        Movie.find({"MovieName":{'$regex': req.param('str'),$options: 'i'}}, twisted(res));    	
     });
     app.get('/searchMovie', isLoggedIn, function (req, res) {
         //res.redirect('/searchMovie');
@@ -170,8 +170,8 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-    	console.log(req.param('str'));
-        Movie.find({MovieName:'a'}, twisted(res));  
+    	//console.log(req.param('str'));
+        Movie.find({}, twisted(res));  
 
     });
     //view individual movie
