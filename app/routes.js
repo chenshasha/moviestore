@@ -159,7 +159,7 @@ module.exports = function (app, passport) {
     	
     	Movie.count({id:{$exists:true}},function(err,count){
     	
-    newMovie.id				= count+1;
+    newMovie.id				= count+1;//to  increment the id
 	newMovie .MovieName  	= req.param('movie_name');
 	newMovie .MovieBanner  	= req.param('banner');
 	newMovie .ReleaseDate   = req.param('releaseDate');
