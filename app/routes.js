@@ -186,6 +186,53 @@ module.exports = function (app, passport) {
        Movie.remove({_id: req.params.id}).exec();
         res.redirect('/searchMovie');
     });
+ //***************************************************************
+    //search movie for members
+    app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {	
+    	var twisted = function(res){
+            return function(err, movies){
+                if (err){
+                    console.log('error occured');
+                    return;
+                }
+                res.render('searchMovieForMembers.ejs', {movies: movies});
+            }
+        }
+    	var name = req.param('searchparam');
+    	var value = {'$regex': req.param('str'),$options: 'i'};
+    	if (req.param('searchparam')=="id" || req.param('searchparam')=="ReleaseDate" || req.param('searchparam')=="RentAmt" || req.param('searchparam')=="AvlCopies"){value=req.param('str');}
+    	var query = {};
+    	query[name] = value;
+    	console.log(query);
+    	Movie.find(query, twisted(res));  	
+    });
+    
+    
+    app.get('/searchMovieForMembers', isLoggedIn, function (req, res) {
+    	var twisted = function(res){
+            return function(err, movies){
+                if (err){
+                    console.log('error occured');
+                    return;
+                }
+                res.render('searchMovieForMembers.ejs', {movies: movies});
+            }
+        }
+        Movie.find({}, twisted(res)).limit(100);  
+    });
+    
+    
+ //***************************************************************   
+    //view movie for members
+    
+    app.get('/movie-view-only/:id', isLoggedIn, function (req, res) {
+    	 Movie.findOne({_id: req.params.id}, function (err,movies) {
+             if (err) {};
+             res.render('movie-view-only.ejs', {movies: movies});
+
+        
+        });
+    });
     
     
  //***************************************************************   
