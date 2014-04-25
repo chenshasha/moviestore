@@ -52,7 +52,7 @@
             </table>
            
 
-            <a href="/deleteMovie/<%= movies.MovieName %>"  class="btn btn-primary">Delete Movie</a>
+            <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
 
            
 
@@ -63,4 +63,22 @@
 
 </div>
 
-
+<script type="text/javascript">
+function confirmDeletion() {
+ 
+  var confirmmessage = "Are you sure you want to delete?";
+ 
+  var message = "Action Was Cancelled By User";
+ 
+  if (confirm(confirmmessage)) {
+      alert("Movie Deleted ");
+      window.location = "/deleteMovie/<%= movies._id %>"
+ 
+  } else {
+ 
+       alert(message);
+ 
+  }
+ 
+}
+</script>

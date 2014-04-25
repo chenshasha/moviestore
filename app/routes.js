@@ -180,6 +180,12 @@ module.exports = function (app, passport) {
     	});
         });
 //***************************************************************
+  //delete individual movie
+    
+    app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
+       Movie.remove({_id: req.params.id}).exec();
+        res.redirect('/searchMovie');
+    });
     
     
  //***************************************************************   
