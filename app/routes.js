@@ -226,7 +226,7 @@ module.exports = function (app, passport) {
     //view movie for members
     
     app.get('/movie-view-only/:id', isLoggedIn, function (req, res) {
-    	 Movie.findOne({_id: req.params.id}, function (err,movies) {
+    	 Movie.findOne({id: req.params.id}, function (err,movies) {
              if (err) {};
              res.render('movie-view-only.ejs', {movies: movies});
 
@@ -292,7 +292,7 @@ module.exports = function (app, passport) {
     
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({_id: req.params.id}, function (err,movies) {
+        Movie.findOne({id: req.params.id}, function (err,movies) {
               if (err) {};
               res.render('viewMoviePage.ejs', {movies: movies});
 

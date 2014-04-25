@@ -9,7 +9,7 @@
 <label> Search Attribute </label>
 <form class="form-inline" role="form" method="post" action="/searchMovieForMembers">
   <select class="form-control" id="searchparam" name="searchparam">
-                    <option value="id">id</option>
+                   
                     <option value="MovieName">MovieName</option>
                     <option value="MovieBanner">MovieBanner</option>
                     <option value="ReleaseDate">ReleaseDate</option>
@@ -30,8 +30,8 @@
 
     <div class="panel panel-default">
         <div class="panel-heading">
-            <a href="/movie-view-only/<%= movies._id %>"><h3 class="panel-title"> <%= movies.MovieName %></h3> </a>
-            <div>Id: <%= movies.id %></div>
+            <a href="/movie-view-only/<%= movies.id %>"><h3 class="panel-title"> <%= movies.MovieName %></h3> </a>
+            
         </div>        
 	</div>
 <% }); %>

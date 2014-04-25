@@ -12,13 +12,13 @@ var schemaKeyList = ['id','MovieName', 'MovieBanner', 'ReleaseDate', 'RentAmt','
 
 // define the schema for our user model
 var movieSchema = mongoose.Schema({
-        id        	 : Number,
-        MovieName    : String,
-        MovieBanner  : String,
-        ReleaseDate  : Number,
-        RentAmt   	 : Number,
-        AvlCopies    : Number,
-        category     : String
+        id        	 		: Number,
+        MovieName    		: String,
+        MovieBanner  		: String,
+        ReleaseDate  		: Number,
+        RentAmount   		: Number,
+        AvailableCopies     : Number,
+        category     		: String
 });
 
 var RepOppDoc = mongoose.model('Movie', movieSchema);
