@@ -163,13 +163,14 @@ module.exports = function (app, passport) {
 	newMovie .MovieName  	= req.param('movie_name');
 	newMovie .MovieBanner  	= req.param('banner');
 	newMovie .ReleaseDate   = req.param('releaseDate');
-	newMovie .RentAmt  		= req.param('rentAmount');
-	newMovie .AvlCopies  	= req.param('availableCopies');
-	newMovie.category 		= req.param('category');
+	newMovie .RentAmount  		= req.param('rentAmount');
+	newMovie .AvailableCopies  	= req.param('availableCopies');
+	//newMovie.category 		= req.param('category');
 
-	if(req.param('category') === "Other"){
+	if(req.param('category') === "other"){
 		newMovie.category = req.param('other');
 	}
+	else newMovie.category 		= req.param('category');
  
     
     	newMovie.save();
@@ -292,7 +293,7 @@ module.exports = function (app, passport) {
     
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({id: req.params.id}, function (err,movies) {
+        Movie.findOne({_id: req.params.id}, function (err,movies) {
               if (err) {};
               res.render('viewMoviePage.ejs', {movies: movies});
 
