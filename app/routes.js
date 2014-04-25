@@ -8,15 +8,27 @@ GLOBAL.count=0;
 module.exports = function (app, passport) {
 
 
-    //Member Management
-    //member upgrade
-    app.get('/upgrade/:id', isLoggedIn, function (req, res) {
+//****************************************************************
+// Member Management
+//****************************************************************
+    //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
+    app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
         var memberDay = new Date();
-        memberDay.setDate(memberDay.getDate()+31)
-        User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
-            "local.expireDate":memberDay}).exec();
-        var pathName = '/profile/'+ req.params.id;
+        
+        if(req.params.type == "Simple"){
+        	memberDay.setDate(memberDay.getDate()+31);
+        	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
+                "local.expireDate":memberDay}).exec();
+
+        }else{
+        	memberDay.setDate(memberDay.getDate()+365);
+        	User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.createDate":new Date(),
+                "local.expireDate":memberDay}).exec();
+        	
+        }
+        
+        var pathName = pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
     });
 
@@ -49,7 +61,92 @@ module.exports = function (app, passport) {
         res.redirect(pathName);
 
     });
+    
 
+    //member view profile
+    app.get('/profile-view-only', isLoggedIn, function (req, res) {
+        User.findOne({user_id: req.user.id}, function(err, user) {
+            res.render('profile-view-only.ejs', {
+                user : req.user
+            });
+        });
+    });
+    
+    //view individual profile
+    app.get('/profile/:id', isLoggedIn, function (req, res) {
+         User.findOne({"local.email": req.params.id}, function (err, user) {
+              if (err) {};
+              res.render('profile.ejs', {user: user});
+
+            });
+    }); 
+
+
+    //modify profile
+    app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            if (err) {
+            };
+            res.render('modifyprofile.ejs', {
+                user: user
+            });
+        });
+    });
+
+    app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
+        User.update({"local.email": req.params.id},{"local.firstName": req.param('firstName'), "local.lastName":req.param('lastName'),
+            "local.address":req.param('address'), "local.phone":req.param('phone')}).exec();
+        var pathName = '/profile/'+ req.params.id;
+        res.redirect(pathName);
+    });
+    
+    //delete individual member
+    app.get('/destroy/:id', isLoggedIn, function (req, res) {
+        User.remove({"local.email": req.params.id}).exec();
+        res.redirect('/adminstore');
+    });
+    
+    
+    //view all members
+    app.get('/searchMember', function(req, res) {
+
+        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
+            if (err) {
+            }
+            ;
+            res.render('searchMember.ejs', {
+                users: users
+            });
+        });
+
+    });
+    
+    //search members based on attributes
+    app.post('/searchMember', isLoggedIn, function (req, res) {	
+    	
+    	var name = 'local.' + req.param('searchparam');
+    	var value = {'$regex': req.param('str'), $options: 'i'};
+    	var query = {};
+    	query[name] = value;
+    	
+    	console.log(query);
+    	
+    	User.find(query, function (err, users) {
+    		if (err) {
+            }
+            ;
+            res.render('searchMember.ejs', {
+                users: users
+            });
+        });
+
+    });
+    
+    
+    
+    
+//****************************************************************
+// Movie Management
 //****************************************************************
     //Create New Movie
     
@@ -58,40 +155,40 @@ module.exports = function (app, passport) {
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
     	var newMovie            = new Movie();
-    	//var total=Movie.count({ id: { $exists: true } });
+    	var total=0;
     	
-
+    	Movie.count({id:{$exists:true}},function(err,count){
     	
-    	
+    newMovie.id				= count+1;//to  increment the id
+	newMovie .MovieName  	= req.param('movie_name');
+	newMovie .MovieBanner  	= req.param('banner');
+	newMovie .ReleaseDate   = req.param('releaseDate');
+	newMovie .RentAmt  		= req.param('rentAmount');
+	newMovie .AvlCopies  	= req.param('availableCopies');
+	newMovie.category 		= req.param('category');
 
-    	newMovie .id      		= Math.random();           //temporary solution
-    	newMovie .MovieName  	= req.param('movie_name');
-    	newMovie .MovieBanner  	= req.param('banner');
-    	newMovie .ReleaseDate   = req.param('releaseDate');
-    	newMovie .RentAmt  		= req.param('rentAmount');
-    	newMovie .AvlCopies  	= req.param('availableCopies');
-    	newMovie.category 		= req.param('category');
-
-    	if(req.param('category') == "Other"){
-    		newMovie.category = req.param('other');
-    	}
-
+	if(req.param('category') === "Other"){
+		newMovie.category = req.param('other');
+	}
+ 
+    
     	newMovie.save();
-    	var pathName = '/viewMoviePage/'+ newMovie.id;
+    	console.log(newMovie._id);
+    	
+    	var pathName = '/viewMoviePage/'+ newMovie._id;
     	res.redirect(pathName);
-
+    	});
+        });
+//***************************************************************
+  //delete individual movie
+    
+    app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
+       Movie.remove({_id: req.params.id}).exec();
+        res.redirect('/searchMovie');
     });
-
+    
     
  //***************************************************************   
-    //view individual profile
-    app.get('/profile/:id', isLoggedIn, function (req, res) {
-         User.findOne({"local.email": req.params.id}, function (err, user) {
-              if (err) {};
-              res.render('profile.ejs', {user: user});
-
-            });
-    });
     
     //view all movies
     app.get('/movieall', isLoggedIn, function (req, res) {	
@@ -113,39 +210,6 @@ module.exports = function (app, passport) {
 
     });
     
-
-    //member view profile
-    app.get('/profile-view-only', isLoggedIn, function (req, res) {
-        User.findOne({user_id: req.user.id}, function(err, user) {
-            res.render('profile-view-only.ejs', {
-                user : req.user
-            });
-        });
-    });
-
-    //delete individual member
-    app.get('/destroy/:id', isLoggedIn, function (req, res) {
-        User.remove({"local.email": req.params.id}).exec();
-        res.redirect('/adminstore');
-    });
-
-    //modify profile
-    app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
-        User.findOne({"local.email": req.params.id}, function (err, user) {
-            if (err) {
-            };
-            res.render('modifyprofile.ejs', {
-                user: user
-            });
-        });
-    });
-
-    app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
-        User.update({"local.email": req.params.id},{"local.firstName": req.param('firstName'), "local.lastName":req.param('lastName'),
-            "local.address":req.param('address'), "local.phone":req.param('phone')}).exec();
-        var pathName = '/profile/'+ req.params.id;
-        res.redirect(pathName);
-    });
 //*******************************************
     app.post('/searchMovie', isLoggedIn, function (req, res) {	
     	var twisted = function(res){
@@ -157,10 +221,16 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-        Movie.find({"MovieName":{'$regex': req.param('str'),$options: 'i'}}, twisted(res));    	
+    	var name = req.param('searchparam');
+    	var value = {'$regex': req.param('str'),$options: 'i'};
+    	if (req.param('searchparam')=="id" || req.param('searchparam')=="ReleaseDate" || req.param('searchparam')=="RentAmt" || req.param('searchparam')=="AvlCopies"){value=req.param('str');}
+    	var query = {};
+    	query[name] = value;
+    	console.log(query);
+    	Movie.find(query, twisted(res));  	
     });
+    
     app.get('/searchMovie', isLoggedIn, function (req, res) {
-        //res.redirect('/searchMovie');
     	var twisted = function(res){
             return function(err, movies){
                 if (err){
@@ -170,38 +240,17 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-    	//console.log(req.param('str'));
-        Movie.find({}, twisted(res));  
-
+        Movie.find({}, twisted(res)).limit(100);  
     });
+    
     //view individual movie
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({id: req.params.id}, function (err,movies) {
+        Movie.findOne({_id: req.params.id}, function (err,movies) {
               if (err) {};
               res.render('viewMoviePage.ejs', {movies: movies});
 
             });
-    });
-
- 
- //********************************************   
-
-    //view all members
-    app.get('/searchMember', function(req, res) {
-
-        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
-            if (err) {
-            }
-            ;
-            res.render('searchMember.ejs', {
-                users: users
-            });
-        });
-
-    });
-
-    //view profile-view-only
-
+    });   
 
 
 
