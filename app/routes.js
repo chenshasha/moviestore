@@ -234,7 +234,7 @@ module.exports = function (app, passport) {
                 res.render('searchMovie.ejs', {movies: movies});
             }
         }
-        Movie.find({}, twisted(res));  
+        Movie.find({}, twisted(res)).limit(100);  
     });
     
     //view individual movie

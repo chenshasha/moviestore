@@ -22,6 +22,7 @@ var movieSchema = mongoose.Schema({
 });
 
 var RepOppDoc = mongoose.model('Movie', movieSchema);
+/*
 console.log('Database loading started');
 
 RepOppDoc.collection.remove(function(err, p){
@@ -53,7 +54,7 @@ function createDocRecurse (err) {
 }
 
 createDocRecurse(null);
-
+*/
 
 // methods ======================
 
