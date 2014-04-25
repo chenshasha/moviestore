@@ -1,4 +1,4 @@
-<%- include adminheader %>
+<%- include memberheader %>
 <div style="padding:30px">
 </div>
 
@@ -15,10 +15,7 @@
             <table class="table table-bordered table-hover">
                 <tbody style="text-align:left;">
                 
-                <tr>
-                    <th style="width: 150px;">MovieID: </th>
-                    <td><%=movies.id%><br></td>
-                </tr>
+               
                 <tr>
                     <th style="width: 150px;">Movie Name: </th>
                     <td><%=movies.MovieName%><br></td>
@@ -52,33 +49,12 @@
             </table>
            
 
-            <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
-
            
 
 
-            </div>
+          
     </form>
 
 
 </div>
 
-<script type="text/javascript">
-function confirmDeletion() {
- 
-  var confirmmessage = "Are you sure you want to delete?";
- 
-  var message = "Action Was Cancelled By User";
- 
-  if (confirm(confirmmessage)) {
-      alert("Movie Deleted ");
-      window.location = "/deleteMovie/<%= movies._id %>"
- 
-  } else {
- 
-       alert(message);
- 
-  }
- 
-}
-</script>
