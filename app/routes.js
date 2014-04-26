@@ -318,6 +318,7 @@ module.exports = function (app, passport) {
             "ReleaseDate":req.param('releaseDate'), "RentAmount":req.param('rentAmount'),"AvailableCopies":req.param('availableCopies'),"category":req.param('category')}).exec();
         var pathName = '/viewMoviePage/'+ req.params.id;
         res.redirect(pathName);
+        
     });
     
     
