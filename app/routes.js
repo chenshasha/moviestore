@@ -299,7 +299,30 @@ module.exports = function (app, passport) {
 
             });
     });   
+//***************************************************************
+  //modify movie
+    
+    
+    app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
+       Movie.findOne({_id: req.params.id}, function (err, movies) {
+            if (err) {
+            };
+            res.render('modifyMovie.ejs', {
+               movies: movies
+            });
+        });
+    });
 
+    app.post('/modifyMovie/:id', isLoggedIn, function (req, res) {
+       Movie.update({_id:req.params.id},{"MovieName": req.param('movie_name'), "MovieBanner":req.param('banner'),
+            "ReleaseDate":req.param('releaseDate'), "RentAmount":req.param('rentAmount'),"AvailableCopies":req.param('availableCopies'),"category":req.param('category')}).exec();
+        var pathName = '/viewMoviePage/'+ req.params.id;
+        res.redirect(pathName);
+        
+    });
+    
+    
+//***************************************************************    
 
 
     //direct to user page

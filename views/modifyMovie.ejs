@@ -1,0 +1,53 @@
+<%- include adminheader %>
+
+
+<div style="padding:30px">
+</div>
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+    </div>
+</div>
+
+
+<form action="/modifyMovie/<%= movies._id %>" method="post" accept-charset="utf-8">
+    <div class="col-md-6 col-md-offset-3">
+        <table class="table table-bordered">
+            <tbody style="text-align:left;">
+            <tr>
+                    <th style="width: 150px;">MovieID: </th>
+                   <td><input class="form-control" name="movieID" size = "50" disabled="disabled" data-type="text" data-placement="right" required value="<%=movies.id%>"></td>
+                </tr>
+            <tr>
+                <th style="width: 150px;">Movie Name: </th>
+                <td><input class="form-control" name="movie_name" size = "50" data-type="text" data-placement="right" required value="<%=movies.MovieName%>"></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Banner: </th>
+                <td><input class="form-control" name="banner" size = "50" data-type="text" data-placement="right" value="<%=movies.MovieBanner%>" required></td>
+            </tr>
+
+            <tr>
+                <th style="width: 150px;">Release Date: </th>
+                <td><input class="form-control" name="releaseDate" size = "50" data-type="text" data-placement="right" value="<%=movies.ReleaseDate%>" required></td>
+            </tr>
+            <tr>
+                <th style="width: 150px;">Rent Amount: </th>
+                <td><input class="form-control" name="rentAmount" size = "50" data-type="text" data-placement="right" value="<%=movies.RentAmount%>" required> </td>
+            </tr>
+             <tr>
+                <th style="width: 150px;">Category: </th>
+                <td><input class="form-control" name="category" size = "50" data-type="text" data-placement="right" value="<%=movies.category%>" required></td>
+            </tr>
+             <tr>
+                <th style="width: 150px;">Available Copies: </th>
+                <td><input class="form-control" name="availableCopies" size = "50" data-type="text" data-placement="right"  value="<%=movies.AvailableCopies%>" required></td>
+            </tr>
+
+               
+
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <a href="/viewMoviePage/<%= movies._id %>" class="btn btn-primary">Cancel  </a>
+</form>
