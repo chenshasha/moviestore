@@ -1,0 +1,44 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+	<form action="/memberAll">
+	    
+	    <div class="page-header text-center">	
+	        <h1><span class="fa fa-anchor"></span> All Members <%=users.length%> </h1>      
+	    </div>
+
+        <div class="col-md-12 col-md-offset-0">
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+	                <tr>
+	                	<th>Email </th>
+	                	<th>Name </th>
+	                	<th>Phone Number </th>
+	                	<th>Address </th>
+	                	<th>Membership </th>
+	                	<th>Expire Date </th>
+	                </tr>  
+	                
+	                <% users.forEach( function ( user ){ %>
+	                <tr>
+	                    <td><%= user.local.email %><br></td>                                        
+	                    <td><%= user.local.firstName %> <%= user.local.lastName %></td>              
+	                    <td><%= user.local.phone %><br></td>             
+	                    <td><%= user.local.address %></td>           
+	                    <td><%= user.local.userType %></td>               
+	                    <td><%= user.local.expireDate %></td>
+	                </tr>
+	                <% }); %> 
+	                              
+                </tbody>
+            </table>
+		</div> 
+		              
+    </form>    
+</div>
+
+ <script type="text/javascript">
+ 	
+ </script>

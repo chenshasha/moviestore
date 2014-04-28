@@ -14,6 +14,9 @@ var userSchema = mongoose.Schema({
         firstName    : String,
         lastName     : String,
         phone        : String,
+        zipcode      : String,
+        city         : String,
+        state        : String,
         address      : String
 
     }

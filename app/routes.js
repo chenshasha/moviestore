@@ -42,6 +42,9 @@ module.exports = function (app, passport) {
         var newUser            = new User();
         // set the user's local credentials
         newUser.local.email      = req.param('email');
+        newUser.local.city       = req.param('city');
+        newUser.local.state      = req.param('state');
+        newUser.loacal.zipcode   = req.param('zipcode');
         newUser.local.firstName  = req.param('firstName');
         newUser.local.lastName   = req.param('lastName');
         newUser.local.phone      = req.param('phone');
@@ -107,7 +110,7 @@ module.exports = function (app, passport) {
     });
     
     
-    //view all members
+    //search members
     app.get('/searchMember', function(req, res) {
 
         User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
@@ -142,6 +145,26 @@ module.exports = function (app, passport) {
 
     });
     
+    
+    //view all members
+    app.get('/memberAll', isLoggedIn, function (req, res) {	
+    	
+    	User.find({}, function (err, users) {
+    		if (err) {
+    			console.log('error occured');
+                return;
+            }
+    		GLOBAL.count=GLOBAL.count+1;
+            res.render('memberAll.ejs', {
+            	users: users, 
+            });
+        });
+    	
+    });
+    
+    app.post('/memberAll', isLoggedIn, function (req, res) { 
+    	res.redirect('/memberAll');     
+    });
     
     
     
