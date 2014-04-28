@@ -42,6 +42,9 @@ module.exports = function (app, passport) {
         var newUser            = new User();
         // set the user's local credentials
         newUser.local.email      = req.param('email');
+        newUser.local.city       = req.param('city');
+        newUser.local.state      = req.param('state');
+        newUser.loacal.zipcode   = req.param('zipcode');
         newUser.local.firstName  = req.param('firstName');
         newUser.local.lastName   = req.param('lastName');
         newUser.local.phone      = req.param('phone');
