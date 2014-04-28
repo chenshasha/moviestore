@@ -107,7 +107,7 @@ module.exports = function (app, passport) {
     });
     
     
-    //view all members
+    //search members
     app.get('/searchMember', function(req, res) {
 
         User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
@@ -142,6 +142,26 @@ module.exports = function (app, passport) {
 
     });
     
+    
+    //view all members
+    app.get('/memberAll', isLoggedIn, function (req, res) {	
+    	
+    	User.find({}, function (err, users) {
+    		if (err) {
+    			console.log('error occured');
+                return;
+            }
+    		GLOBAL.count=GLOBAL.count+1;
+            res.render('memberAll.ejs', {
+            	users: users, 
+            });
+        });
+    	
+    });
+    
+    app.post('/memberAll', isLoggedIn, function (req, res) { 
+    	res.redirect('/memberAll');     
+    });
     
     
     
