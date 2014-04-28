@@ -58,6 +58,21 @@
                     <td><%= user.local.expireDate %></td>
                 </tr>
 
+                <tr>
+                    <th style="width: 150px;">Checkout Copy: </th>
+                    <td><%= user.local.checkedOutCopy %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Available Copy: </th>
+                    <td><%= user.local.availableCopy %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Balance: </th>
+                    <td><%= user.local.balance %></td>
+                </tr>
+
                 </tbody>
             </table>
             <a href="/modifyprofile/<%= user.local.email %>" class="btn btn-primary">Modify Profile  </a>

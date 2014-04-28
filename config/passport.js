@@ -71,6 +71,9 @@ module.exports = function(passport) {
                 newUser.local.expireDate = new Date();
                 newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
                 newUser.local.createDate = new Date();
+                newUser.local.balance = 0;
+                newUser.local.availableCopy = 2;
+                newUser.local.checkedOutCopy = 0;
                 newUser.local.firstName  = req.param('fname');
                 newUser.local.lastName   = req.param('lname');
 

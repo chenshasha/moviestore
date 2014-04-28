@@ -17,6 +17,9 @@ var userSchema = mongoose.Schema({
         zipcode      : String,
         city         : String,
         state        : String,
+        checkedOutCopy  : Number,
+        availableCopy   : Number,
+        balance      :  Number,
         address      : String
 
     }

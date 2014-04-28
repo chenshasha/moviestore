@@ -17,6 +17,7 @@ module.exports = function (app, passport) {
         var memberDay = new Date();
         
         if(req.params.type == "Simple"){
+
         	memberDay.setDate(memberDay.getDate()+31);
         	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
                 "local.expireDate":memberDay}).exec();
@@ -44,7 +45,7 @@ module.exports = function (app, passport) {
         newUser.local.email      = req.param('email');
         newUser.local.city       = req.param('city');
         newUser.local.state      = req.param('state');
-        newUser.loacal.zipcode   = req.param('zipcode');
+        newUser.local.zipcode   = req.param('zipcode');
         newUser.local.firstName  = req.param('firstName');
         newUser.local.lastName   = req.param('lastName');
         newUser.local.phone      = req.param('phone');
@@ -53,6 +54,9 @@ module.exports = function (app, passport) {
         newUser.local.createDate = new Date();
         newUser.local.userType   = req.param('userType');
         newUser.local.expireDate = new Date();
+        newUser.local.balance    = 0;
+        newUser.local.availableCopy = 2;
+        newUser.local.checkedOutCopy = 0;
         if(req.param('userType') == "Simple"){
             newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
         }else{
