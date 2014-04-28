@@ -15,19 +15,52 @@ module.exports = function (app, passport) {
     app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
         var memberDay = new Date();
+
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            //console.log(user.local.checkedOutCopy);
+            var checkedOutCopy = user.local.checkedOutCopy;
+            var availableCopy = 0;
+            if(req.params.type == "Simple"){
+                if (checkedOutCopy >= 10 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 10 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+31);
+                User.update({"local.email": req.params.id},{"local.userType": "Premium","local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }else{
+                if (checkedOutCopy >= 2 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 2 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+365);
+                User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }
+
+
+        });
+
+
         
-        if(req.params.type == "Simple"){
-
-        	memberDay.setDate(memberDay.getDate()+31);
-        	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
-                "local.expireDate":memberDay}).exec();
-
-        }else{
-        	memberDay.setDate(memberDay.getDate()+365);
-        	User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.createDate":new Date(),
-                "local.expireDate":memberDay}).exec();
-        	
-        }
+//        if(req.params.type == "Simple"){
+//
+//        	memberDay.setDate(memberDay.getDate()+31);
+//        	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
+//                "local.expireDate":memberDay}).exec();
+//
+//        }else{
+//        	memberDay.setDate(memberDay.getDate()+365);
+//        	User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.createDate":new Date(),
+//                "local.expireDate":memberDay}).exec();
+//
+//        }
         
         var pathName = pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
