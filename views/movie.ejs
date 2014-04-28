@@ -29,7 +29,10 @@
                 </tr>
                 
                 <%
-				for(var k=min; k<max; k++) {%>
+                
+				for(var k=min; k<=max; k++) {
+				if(max<movie.length){
+				%>
     
                 <tr>
                     <td><%= movie[k].id %><br></td>   
@@ -40,14 +43,17 @@
                
                     <td><%= movie[k].ReleaseDate %></td>
                 
-                    <td><%= movie[k].RentAmt %></td>
+                    <td><%= movie[k].RentAmount %></td>
                 
-                    <td><%= movie[k].AvlCopies %></td>
+                    <td><%= movie[k].AvailableCopies %></td>
                     
                     <td><%= movie[k].category %></td>
                 </tr>
                 
-                <% } %>
+                <%} }
+                
+               
+               %>
 
                 </tbody>
             </table>

@@ -9,7 +9,7 @@
 
 
 
-<form action="/createMovie" method="post" accept-charset="utf-8">
+<form action="/createMovie" method="post" accept-charset="utf-8" name="createForm" onsubmit="return (validateForm());">
     <div class="col-md-6 col-md-offset-3">
         <table class="table table-bordered table-hover">
             <tbody style="text-align:left;">
@@ -70,6 +70,47 @@
     
     
     <script type="text/javascript">
+    function validateForm()
+{ if( document.createForm.movie_name.value == "" )
+   {
+     alert( "Please provide movie name!" );
+     document.createForm.movie_name.focus() ;
+     return false;
+   }
+   if( document.createForm.banner.value == "" )
+   {
+     alert( "Please provide movie banner!" );
+     document.createForm.banner.focus() ;
+     return false;
+   }
+   if( document.createForm.releaseDate.value == "" ||
+           isNaN( document.createForm.releaseDate.value ) ||
+           document.createForm.releaseDate.value.length != 4 )
+   {
+     alert( "Please provide a release date in the format of year." );
+     document.createForm.releaseDate.focus() ;
+     return false;
+   }
+   if( document.createForm.rentAmount.value == "" ||
+           isNaN( document.createForm.releaseDate.value ) )
+   {
+     alert( "Please provide rent amount!" );
+     return false;
+   }
+    if( document.createForm.category.value == "")
+   {
+     alert( "Please provide category of movie!" );
+     return false;
+   }
+    if( document.createForm.availableCopies.value == "" ||
+           isNaN( document.createForm.availableCopies.value ) )
+   {
+     alert( "Please provide number of copies available!" );
+     return false;
+   }
+  
+   return( true );
+}
 function enable() {
     if (document.getElementById("category").value != "other"){
         document.getElementById("other").disabled = true;
