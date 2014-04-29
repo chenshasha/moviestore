@@ -353,9 +353,17 @@ module.exports = function (app, passport) {
     
 //***************************************************************
     //delete individual movie
+    //mongodb
 
-    app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
+   /* app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
         Movie.remove({_id: req.params.id}).exec();
+        res.redirect('/searchMovie');
+    });*/
+    
+  //delete individual movie mysql
+    app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
+       
+        connection.query('DELETE FROM movies WHERE id = '+ req.params.id);
         res.redirect('/searchMovie');
     });
     //***************************************************************
@@ -534,7 +542,7 @@ module.exports = function (app, passport) {
     //modify profile
     app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
 
-        connection.query('SELECT * FROM movies WHERE id = '+ req.params.id +'', function(err, rows, fields) {
+        connection.query('SELECT * FROM movies WHERE id = '+ req.params.id , function(err, rows, fields) {
             if (err) {};
             res.render('modifyMovie.ejs', {
                 movies: rows[0]
@@ -549,7 +557,7 @@ module.exports = function (app, passport) {
         connection.query('UPDATE movies SET id='+req.param('movieID')+', MovieName = "'+ req.param('movie_name')
             +'", MovieBanner = "' + req.param('banner') + '", ReleaseDate = '+ req.param('releaseDate')
             +', RentAmount = ' + req.param('rentAmount') +', AvailableCopies = '+ req.param('availableCopies') +', category ="'
-            + req.param('category') +'" WHERE id = '+req.param('movieID')+'', function(err, rows, fields) {
+            + req.param('category') +'" WHERE id = "'+req.param('movieID')+'"', function(err, rows, fields) {
 
         });
 
