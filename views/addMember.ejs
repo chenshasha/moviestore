@@ -7,6 +7,13 @@
         <h1><span class="fa fa-anchor"></span> Add Member</h1>
     </div>
 
+    <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
+
+    <% if (message.length > 0) { %>
+    <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+
+    </div>
 
 
 <form action="/addMember" method="post" accept-charset="utf-8">

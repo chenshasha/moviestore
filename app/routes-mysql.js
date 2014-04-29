@@ -23,7 +23,7 @@ module.exports = function (app, passport) {
     //to do
     //add new member
     app.get('/addMember', isLoggedIn, function (req, res) {
-        res.render('addmember.ejs'); // load the index.ejs file
+        res.render('addmember.ejs', {message: req.flash('userDuplicate')}); // load the index.ejs file
     });
 
     app.post('/addMember', isLoggedIn, function (req, res) {
@@ -35,12 +35,15 @@ module.exports = function (app, passport) {
                 console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
                 console.log(rows);
                 //flash the message
+                req.flash('userDuplicate', 'That email exists already.');
 
-                res.render('addMember.ejs', {
+                res.render('addMember.ejs', { message: req.flash('userDuplicate') });
 
-                });
             }else{
-                var userId     = Math.floor(Math.random() * 1000000000);
+                //var userId     = Math.floor(Math.random() * 1000000000);
+
+                var idString   = (Math.floor(Math.random()* 900000000) + 100000000).toString();;
+                var userId     = idString.substr(0,3) + "-" + idString.substr(3,2) + "-" + idString.substr(5,4);
                 var email      = req.param('email');
                 var password   = req.param('password');
                 var address    = req.param('address');
@@ -182,15 +185,25 @@ module.exports = function (app, passport) {
         }
 
 
-        connection.query('INSERT user ' +
-            '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
-              userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
-              phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+        connection.query('UPDATE user SET city = "' + city
+            + '", state = "' + state +'", zipcode = "' + zipcode
+            + '", firstName = "' + firstName + '", lastName = "'+ lastName + '", phone = "' + phone + '", createDate = "' + createDate + '",'
+            + 'userType = "' + userType + '", expireDate = "' + expireDate +'", balance = '+ balance +', checkedOutCopy = '+ checkedOutCopy + ',availableCopy = '
+            + availableCopy +', address = "' + address + '" WHERE userId = "'
+            + userId +'"', function(err, rows, fields) {
+
             if(err){
                 console.log()
 
             }
-        });
+            console.log('UPDATE user SET city = "' + city
+                + '", state = ' + state +', zipcode = "' + zipcode
+                + '", firstName = "' + firstName + '", lastName = "'+ lastName + '", phone = "' + phone + '", createDate = "' + createDate + '",'
+                + 'userType = "' + userType + '", expireDate = "' + expireDate +'", balance = '+ balance +', checkedOutCopy = '+ checkedOutCopy + ',availableCopy = '
+                + availableCopy +', address = "' + address + '" WHERE userId = "'
+                + userId +'"');
+
+            });
 
         res.redirect('/profile-view-only');
 
@@ -199,11 +212,11 @@ module.exports = function (app, passport) {
 
     //member view profile
     app.get('/profile-view-only', isLoggedIn, function (req, res) {
-        console.log(req.session.userId);
-        connection.query('SELECT * from user WHERE userId =' + req.session.userId, function(err, rows, fields) {
-            console.log(rows[0].email);
+        console.log('SELECT * from user WHERE userId = "' + req.session.userId + '"');
+        connection.query('SELECT * from user WHERE userId = "' + req.session.userId + '"', function(err, user, fields) {
+
             res.render('profile-view-only.ejs', {
-                user : rows[0]
+                user : user[0]
             });
         });
 
@@ -213,9 +226,11 @@ module.exports = function (app, passport) {
     //view individual profile
     app.get('/profile/:id', isLoggedIn, function (req, res) {
 
-        connection.query('SELECT * FROM user WHERE userId = ' + req.params.id, function(err, rows, fields) {
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
             if (err) {};
-            res.render('profile.ejs', {user: rows[0]});
+            res.render('profile.ejs', {
+                user: user[0]
+            });
 
         });
 

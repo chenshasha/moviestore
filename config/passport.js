@@ -5,7 +5,13 @@ var LocalStrategy   = require('passport-local').Strategy;
 
 // load up the user model
 var User       		= require('../app/models/user');
-
+var mysql = require('../node_modules/mysql');
+var connection = mysql.createConnection({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database : 'moviestore'
+});
 
 
 // expose this function to our app using module.exports
@@ -59,41 +65,24 @@ module.exports = function(passport) {
                     // create the user
                     var newUser            = new User();
 
-                    newUser.local.userId   = Math.floor(Math.random() * 1000000000);
-
-                    // set the user's local credentials
+                    //newUser.local.userId   = Math.floor(Math.random() * 1000000000);
+                    var idString             = (Math.floor(Math.random()* 900000000) + 100000000).toString();;
+                    newUser.local.userId     = idString.substr(0,3) + "-" + idString.substr(3,2) + "-" + idString.substr(5,4);
                     newUser.local.email      = email;
-//                    newUser.local.phone      = req.param('phone');
-//                    newUser.local.address    = req.param('address');
-//                    newUser.local.city       = req.param('city');
-//                    newUser.local.state      = req.param('state');
-//                    newUser.local.zipcode   = req.param('zipcode');
-//                    newUser.local.userType   = 'Simple';
                     newUser.local.password   = newUser.generateHash(password); // use the generateHash function in our user model
-//                    newUser.local.expireDate = new Date();
-//                    newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
-//                    newUser.local.createDate = new Date();
-//                    newUser.local.balance = 0;
-//                    newUser.local.availableCopy = 2;
-//                    newUser.local.checkedOutCopy = 0;
-//                    newUser.local.firstName  = req.param('fname');
-//                    newUser.local.lastName   = req.param('lname');
-
-                    // save the user
-//                    newUser.save(function(err) {
-//                        if (err)
-//                            throw err;
-//                        var userCookie = {
-//                            id : user.id,
-//                            email : email
-//                        }
-//                        return done(null, newUser);
-//                    });
-
-
                     req.session.email = email;
                     req.session.userId = newUser.local.userId;
                     newUser.save();
+                    connection.query('INSERT user ' +
+                        '(userId, email) VALUES ("'+
+                        newUser.local.userId+ '","' + email +'")', function(err, rows, fields) {
+                        if(err){
+                            console.log()
+
+                        }
+                    });
+
+
                     return done(null, newUser);
 
                 }
