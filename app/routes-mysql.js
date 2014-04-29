@@ -81,12 +81,13 @@ module.exports = function (app, passport) {
     //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
     app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
+        var today = new Date();
         var memberDay = new Date();
-
-        User.findOne({"local.email": req.params.id}, function (err, user) {
-            //console.log(user.local.checkedOutCopy);
-            var checkedOutCopy = user.local.checkedOutCopy;
-            var availableCopy = 0;
+        var availableCopy = 0;
+        var userType;
+        connection.query('SELECT * from user WHERE userId =' + req.params.id, function(err, rows, fields) {
+            var checkedOutCopy = rows[0].checkedOutCopy;
+            availableCopy = 0;
             if(req.params.type == "Simple"){
                 if (checkedOutCopy >= 10 ){
                     availableCopy = 0;
@@ -94,9 +95,7 @@ module.exports = function (app, passport) {
                     availableCopy = 10 - checkedOutCopy;
                 }
                 memberDay.setDate(memberDay.getDate()+31);
-                User.update({"local.email": req.params.id},{"local.userType": "Premium","local.availableCopy": availableCopy, "local.createDate":new Date(),
-                    "local.expireDate":memberDay}).exec();
-
+                userType = "Premium";
 
             }else{
                 if (checkedOutCopy >= 2 ){
@@ -105,17 +104,20 @@ module.exports = function (app, passport) {
                     availableCopy = 2 - checkedOutCopy;
                 }
                 memberDay.setDate(memberDay.getDate()+365);
-                User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.availableCopy": availableCopy, "local.createDate":new Date(),
-                    "local.expireDate":memberDay}).exec();
-
-
+                userType = "Simple";
             }
+            connection.query('UPDATE user SET userType = "' + userType
+                + '", availableCopy = ' + availableCopy
+                +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
+                + req.params.id +'"', function(err, rows, fields) {
 
+            });
 
         });
 
         var pathName = pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
+
     });
 
 
