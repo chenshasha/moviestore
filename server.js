@@ -40,7 +40,7 @@ app.configure(function () {
 
 // routes ======================================================================
 //use mongodb only
-require('./app/routes.js')(app, passport);
+//require('./app/routes.js')(app, passport);
 var configDB = require('./config/database.js');
 mongoose.connect(configDB.url); // connect to our database
 var db = mongoose.connection;
