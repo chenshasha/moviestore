@@ -15,18 +15,52 @@ module.exports = function (app, passport) {
     app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
         var memberDay = new Date();
-        
-        if(req.params.type == "Simple"){
-        	memberDay.setDate(memberDay.getDate()+31);
-        	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
-                "local.expireDate":memberDay}).exec();
 
-        }else{
-        	memberDay.setDate(memberDay.getDate()+365);
-        	User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.createDate":new Date(),
-                "local.expireDate":memberDay}).exec();
-        	
-        }
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            //console.log(user.local.checkedOutCopy);
+            var checkedOutCopy = user.local.checkedOutCopy;
+            var availableCopy = 0;
+            if(req.params.type == "Simple"){
+                if (checkedOutCopy >= 10 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 10 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+31);
+                User.update({"local.email": req.params.id},{"local.userType": "Premium","local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }else{
+                if (checkedOutCopy >= 2 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 2 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+365);
+                User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }
+
+
+        });
+
+
+        
+//        if(req.params.type == "Simple"){
+//
+//        	memberDay.setDate(memberDay.getDate()+31);
+//        	User.update({"local.email": req.params.id},{"local.userType": "Premium", "local.createDate":new Date(),
+//                "local.expireDate":memberDay}).exec();
+//
+//        }else{
+//        	memberDay.setDate(memberDay.getDate()+365);
+//        	User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.createDate":new Date(),
+//                "local.expireDate":memberDay}).exec();
+//
+//        }
         
         var pathName = pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
@@ -38,13 +72,14 @@ module.exports = function (app, passport) {
     app.get('/addMember', isLoggedIn, function (req, res) {
         res.render('addmember.ejs'); // load the index.ejs file
     });
+
     app.post('/addMember', isLoggedIn, function (req, res) {
         var newUser            = new User();
         // set the user's local credentials
         newUser.local.email      = req.param('email');
         newUser.local.city       = req.param('city');
         newUser.local.state      = req.param('state');
-        newUser.loacal.zipcode   = req.param('zipcode');
+        newUser.local.zipcode   = req.param('zipcode');
         newUser.local.firstName  = req.param('firstName');
         newUser.local.lastName   = req.param('lastName');
         newUser.local.phone      = req.param('phone');
@@ -53,6 +88,9 @@ module.exports = function (app, passport) {
         newUser.local.createDate = new Date();
         newUser.local.userType   = req.param('userType');
         newUser.local.expireDate = new Date();
+        newUser.local.balance    = 0;
+        newUser.local.availableCopy = 2;
+        newUser.local.checkedOutCopy = 0;
         if(req.param('userType') == "Simple"){
             newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
         }else{

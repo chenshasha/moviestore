@@ -34,30 +34,34 @@
     <div class="panel panel-default">
 
         <div class="panel-heading">
-            <a href="/profile/<%= user.local.email %>"><h3 class="panel-title"><%= user.local.email %></h3> </a>
+            <a href="/profile/<%= user.userId %>"><h3 class="panel-title"><%= user.userId %></h3> </a>
         </div>
                
         <table class="table table-bordered table-hover">
             	<tbody style="text-align:left;">
+                    <tr>
+                        <th style="width: 150px;">Email: </th>
+                        <td><%= user.email %></td>
+                    </tr>
             		<tr>
                 		<th style="width: 150px;">Name: </th>
-                		<td><%= user.local.firstName %> <%= user.local.lastName %></td>
+                		<td><%= user.firstName %> <%= user.lastName %></td>
             		</tr>
             		<tr>
                 		<th style="width: 150px;">Phone Number: </th>
-                		<td> <%= user.local.phone %></td>
+                		<td> <%= user.phone %></td>
             		</tr>
             		<tr>
                 		<th style="width: 150px;">Address: </th>
-                		<td> <%= user.local.address %></td>
+                		<td> <%= user.address %></td>
             		</tr>
             		<tr>
                 		<th style="width: 150px;">Membership: </th>
-                		<td> <%= user.local.userType %></td>
+                		<td> <%= user.userType %></td>
             		</tr>
             		<tr>
                 		<th style="width: 150px;">Expire Date: </th>
-                		<td> <%= user.local.expireDate %></td>
+                		<td> <%= user.expireDate %></td>
             		</tr>
             	</tbody>
             </table>
