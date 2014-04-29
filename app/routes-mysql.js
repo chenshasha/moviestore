@@ -27,32 +27,65 @@ module.exports = function (app, passport) {
     });
 
     app.post('/addMember', isLoggedIn, function (req, res) {
-        var newUser            = new User();
-        // set the user's local credentials
-        newUser.local.email      = req.param('email');
-        newUser.local.city       = req.param('city');
-        newUser.local.state      = req.param('state');
-        newUser.local.zipcode   = req.param('zipcode');
-        newUser.local.firstName  = req.param('firstName');
-        newUser.local.lastName   = req.param('lastName');
-        newUser.local.phone      = req.param('phone');
-        newUser.local.address    = req.param('address');
-        newUser.local.password   = newUser.generateHash(req.param('password'));
-        newUser.local.createDate = new Date();
-        newUser.local.userType   = req.param('userType');
-        newUser.local.expireDate = new Date();
-        newUser.local.balance    = 0;
-        newUser.local.availableCopy = 2;
-        newUser.local.checkedOutCopy = 0;
-        if(req.param('userType') == "Simple"){
-            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
-        }else{
-            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+31);
-        }
+        //check whether same email exist
+        connection.query('SELECT * from user WHERE email = "' + req.param('email')+'"', function(err, rows, fields) {
+            if (err) {
+            };
+            if(rows.length != 0){
+                console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
+                console.log(rows);
+                //flash the message
 
-        newUser.save();
-        var pathName = '/profile/'+ req.param('email');
-        res.redirect(pathName);
+                res.render('addMember.ejs', {
+
+                });
+            }else{
+                var userId     = Math.floor(Math.random() * 1000000000);
+                var email      = req.param('email');
+                var password   = req.param('password');
+                var address    = req.param('address');
+                var city       = req.param('city');
+                var state      = req.param('state');
+                var zipcode    = req.param('zipcode');
+                var firstName  = req.param('firstName');
+                var lastName   = req.param('lastName');
+                var phone      = req.param('phone');
+                var createDate = new Date();
+                var userType   = req.param('userType');
+                var expireDate = new Date();
+                var balance    = 0;
+                var availableCopy = 0;
+                var checkedOutCopy = 0;
+                if(req.param('userType') == "Simple"){
+                    expireDate.setDate(expireDate.getDate()+365);
+                    availableCopy = 2;
+                }else{
+                    expireDate.setDate(expireDate.getDate()+31);
+                    availableCopy = 10;
+                }
+
+                connection.query('INSERT user ' +
+                    '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
+                    userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
+                    phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+
+                });
+                //save in mongodb
+                var newUser            = new User();
+                newUser.local.userId   = userId;
+                newUser.local.email      = email;
+                newUser.local.password   = newUser.generateHash(password); // use the generateHash function in our user model
+                newUser.save();
+                var pathName = '/profile/'+ userId;
+                res.redirect(pathName);
+
+
+            };
+
+        });
+
+
+
 
     });
 
