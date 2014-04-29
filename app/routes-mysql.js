@@ -2,6 +2,7 @@
 
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
+
 var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -19,6 +20,70 @@ module.exports = function (app, passport) {
 //****************************************************************
 // Member Management
 //****************************************************************
+    //user first sign up
+    app.get('/register', isLoggedIn, function (req, res) {
+        User.findOne({user_id: req.user.id}, function(err, user) {
+            res.render('addMember-user.ejs', {
+                user : req.user
+            });
+        });
+    });
+
+    app.post('/register', isLoggedIn, function (req, res) {
+
+        // set the user's local credentials
+        var userId     = req.session.userId;
+        var email      = req.session.email;
+        var address    = req.param('address');
+        var city       = req.param('city');
+        var state      = req.param('state');
+        var zipcode    = req.param('zipcode');
+        var firstName  = req.param('firstName');
+        var lastName   = req.param('lastName');
+        var phone      = req.param('phone');
+        var createDate = new Date();
+        var userType   = req.param('userType');
+        var expireDate = new Date();
+        var balance    = 0;
+        var availableCopy = 0;
+        var checkedOutCopy = 0;
+        if(req.param('userType') == "Simple"){
+            expireDate.setDate(expireDate.getDate()+365);
+            availableCopy = 2;
+        }else{
+            expireDate.setDate(expireDate.getDate()+31);
+            availableCopy = 10;
+        }
+
+
+        connection.query('INSERT user ' +
+            '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
+              userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
+              phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+            if(err){
+                console.log()
+
+            }
+        });
+
+        res.redirect('/profile-view-only');
+
+
+    });
+
+    //member view profile
+    app.get('/profile-view-only', isLoggedIn, function (req, res) {
+        console.log(req.session.userId);
+        connection.query('SELECT * from user WHERE userId =' + req.session.userId, function(err, rows, fields) {
+            console.log(rows[0].email);
+            res.render('profile-view-only.ejs', {
+                user : rows[0]
+            });
+        });
+
+    });
+
+
     //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
     app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
 
@@ -97,22 +162,17 @@ module.exports = function (app, passport) {
     });
 
 
-    //member view profile
-    app.get('/profile-view-only', isLoggedIn, function (req, res) {
-        User.findOne({user_id: req.user.id}, function(err, user) {
-            res.render('profile-view-only.ejs', {
-                user : req.user
-            });
-        });
-    });
+
 
     //view individual profile
     app.get('/profile/:id', isLoggedIn, function (req, res) {
-        User.findOne({"local.email": req.params.id}, function (err, user) {
+
+        connection.query('SELECT * FROM user WHERE userId = ' + req.params.id, function(err, rows, fields) {
             if (err) {};
-            res.render('profile.ejs', {user: user});
+            res.render('profile.ejs', {user: rows[0]});
 
         });
+
     });
 
 
@@ -137,21 +197,28 @@ module.exports = function (app, passport) {
     //delete individual member
     app.get('/destroy/:id', isLoggedIn, function (req, res) {
         User.remove({"local.email": req.params.id}).exec();
-        res.redirect('/adminstore');
+        res.redirect('/searchMember');
     });
 
 
     //search members
     app.get('/searchMember', function(req, res) {
 
-        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
-            if (err) {
-            }
-            ;
+        connection.query('SELECT * from user', function(err, users, fields) {
+
             res.render('searchMember.ejs', {
                 users: users
             });
         });
+
+//        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
+//            if (err) {
+//            }
+//            ;
+//            res.render('searchMember.ejs', {
+//                users: users
+//            });
+//        });
 
     });
 
@@ -178,24 +245,24 @@ module.exports = function (app, passport) {
 
 
     //view all members
-    app.get('/memberAll', isLoggedIn, function (req, res) {
+//    app.get('/memberAll', isLoggedIn, function (req, res) {
+//
+//        User.find({}, function (err, users) {
+//            if (err) {
+//                console.log('error occured');
+//                return;
+//            }
+//            GLOBAL.count=GLOBAL.count+1;
+//            res.render('memberAll.ejs', {
+//                users: users,
+//            });
+//        });
+//
+//    });
 
-        User.find({}, function (err, users) {
-            if (err) {
-                console.log('error occured');
-                return;
-            }
-            GLOBAL.count=GLOBAL.count+1;
-            res.render('memberAll.ejs', {
-                users: users,
-            });
-        });
-
-    });
-
-    app.post('/memberAll', isLoggedIn, function (req, res) {
-        res.redirect('/memberAll');
-    });
+//    app.post('/memberAll', isLoggedIn, function (req, res) {
+//        res.redirect('/memberAll');
+//    });
 
 
 
@@ -384,10 +451,10 @@ module.exports = function (app, passport) {
         res.render('store.ejs'); // load the index.ejs file
     });
 
-    //direct to admin page
-    app.get('/adminstore', isLoggedIn, function (req, res) {
-        res.render('adminstore.ejs'); // load the index.ejs file
-    });
+//    //direct to admin page
+//    app.get('/adminstore', isLoggedIn, function (req, res) {
+//        res.render('adminstore.ejs'); // load the index.ejs file
+//    });
 
     // =====================================
     // HOME PAGE (with login links) ========
@@ -419,7 +486,7 @@ module.exports = function (app, passport) {
 
     app.post('/adminlogin', passport.authenticate('local-login',{
 
-        successRedirect: '/adminstore', // redirect to the secure profile section
+        successRedirect: '/searchMember', // redirect to the secure profile section
         failureRedirect: '/adminlogin', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
 
@@ -434,11 +501,12 @@ module.exports = function (app, passport) {
 
         // render the page and pass in any flash data if it exists
         res.render('signup.ejs', { message: req.flash('signupMessage') });
+
     });
 
     // process the signup form
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/profile-view-only', // redirect to the secure profile section
+        successRedirect: '/register', // redirect to the secure profile section
         failureRedirect: '/signup', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));

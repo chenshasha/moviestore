@@ -1,0 +1,63 @@
+<%- include memberheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span>Member Register</h1>
+    </div>
+
+
+
+    <form action="/register" method="post" accept-charset="utf-8">
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+
+                <tr>
+                    <th style="width: 150px;">First Name: </th>
+                    <td><input class="form-control" name="firstName" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Last Name: </th>
+                    <td><input class="form-control" name="lastName" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Phone Number: </th>
+                    <td><input class="form-control" name="phone" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Address: </th>
+                    <td><input class="form-control" name="address" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">City: </th>
+                    <td><input class="form-control" name="city" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">State: </th>
+                    <td><input class="form-control" name="state" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Zip code: </th>
+                    <td><input class="form-control" name="zipcode" size = "50" data-type="text" data-placement="right" required></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Membership: </th>
+                    <td><select class="form-control" id="userType"
+                                name="userType">
+                            <option value="Simple">Simple</option>
+                            <option value="Premium">Premium</option>
+
+                        </select>
+                    </td>
+                </tr>
+
+
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form>
+</div>

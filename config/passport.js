@@ -59,32 +59,42 @@ module.exports = function(passport) {
                     // create the user
                     var newUser            = new User();
 
+                    newUser.local.userId   = Math.floor(Math.random() * 1000000000);
+
                     // set the user's local credentials
                     newUser.local.email      = email;
-                    newUser.local.phone      = req.param('phone');
-                    newUser.local.address    = req.param('address');
-                    newUser.local.city       = req.param('city');
-                    newUser.local.state      = req.param('state');
-                    newUser.local.zipcode   = req.param('zipcode');
-                    newUser.local.userType   = 'Simple';
+//                    newUser.local.phone      = req.param('phone');
+//                    newUser.local.address    = req.param('address');
+//                    newUser.local.city       = req.param('city');
+//                    newUser.local.state      = req.param('state');
+//                    newUser.local.zipcode   = req.param('zipcode');
+//                    newUser.local.userType   = 'Simple';
                     newUser.local.password   = newUser.generateHash(password); // use the generateHash function in our user model
-                    newUser.local.expireDate = new Date();
-                    newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
-                    newUser.local.createDate = new Date();
-                    newUser.local.balance = 0;
-                    newUser.local.availableCopy = 2;
-                    newUser.local.checkedOutCopy = 0;
-                    newUser.local.firstName  = req.param('fname');
-                    newUser.local.lastName   = req.param('lname');
-
+//                    newUser.local.expireDate = new Date();
+//                    newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
+//                    newUser.local.createDate = new Date();
+//                    newUser.local.balance = 0;
+//                    newUser.local.availableCopy = 2;
+//                    newUser.local.checkedOutCopy = 0;
+//                    newUser.local.firstName  = req.param('fname');
+//                    newUser.local.lastName   = req.param('lname');
 
                     // save the user
-                    newUser.save(function(err) {
-                        if (err)
-                            throw err;
-                        return done(null, newUser);
-                    });
+//                    newUser.save(function(err) {
+//                        if (err)
+//                            throw err;
+//                        var userCookie = {
+//                            id : user.id,
+//                            email : email
+//                        }
+//                        return done(null, newUser);
+//                    });
 
+
+                    req.session.email = email;
+                    req.session.userId = newUser.local.userId;
+                    newUser.save();
+                    return done(null, newUser);
 
                 }
 
@@ -124,15 +134,17 @@ module.exports = function(passport) {
 
                 // all is well, return successful user
 
-                user.local.lastDate = user.local.today;
-                user.local.today    = Date.now();
-                user.save(function(err) {
-                    if (err)
-                        throw err;
-                    return done(null, user);
-                });
+//                user.local.lastDate = user.local.today;
+//                user.local.today    = Date.now();
+//                user.save(function(err) {
+//                    if (err)
+//                        throw err;
+//                    return done(null, user);
+//                });
 
-                //return done(null, user);
+                req.session.email = user.local.email;
+                req.session.userId = user.local.userId;
+                return done(null, user);
             });
 
         }));
