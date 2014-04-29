@@ -75,12 +75,13 @@
 
                 </tbody>
             </table>
-            <a href="/modifyprofile/<%= user.email %>" class="btn btn-primary">Modify Profile  </a>
+            <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
 
-            <a href="/destroy/<%= user.email %>"  class="btn btn-primary">Delete Member</a>
+            <a href="/destroy/<%= user.userId %>"  class="btn btn-primary">Delete Member</a>
 
-            <a href="/changeMembership/<%= user.email %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
+            <a href="/changeMembership/<%= user.userId %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
 
+            <a href= "/#" class="btn btn-primary">Issue Movie</a>
 
             </div>
     </form>

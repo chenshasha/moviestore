@@ -10,13 +10,13 @@
 </div>
 
 
-<form action="/modifyprofile/<%= user.local.email %>" method="post" accept-charset="utf-8">
+<form action="/modifyprofile/<%= user.userId %>" method="post" accept-charset="utf-8">
     <div class="col-md-6 col-md-offset-3">
         <table class="table table-bordered">
             <tbody style="text-align:left;">
             <tr>
                 <th style="width: 150px;">Email: </th>
-                <td><%= user.local.email %><br></td>
+                <td><%= user.email %><br></td>
             </tr>
             <tr>
                 <th style="width: 150px;">First Name: </th>
@@ -49,5 +49,5 @@
             </tbody>
         </table>
         <button type="submit" class="btn btn-primary">Submit</button>
-        <a href="/profile/<%= user.local.email %>" class="btn btn-primary">Cancel  </a>
+        <a href="/profile/<%= user.userId %>" class="btn btn-primary">Cancel  </a>
 </form>

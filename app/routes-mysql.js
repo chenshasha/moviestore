@@ -20,6 +20,105 @@ module.exports = function (app, passport) {
 //****************************************************************
 // Member Management
 //****************************************************************
+    //to do
+    //add new member
+    app.get('/addMember', isLoggedIn, function (req, res) {
+        res.render('addmember.ejs'); // load the index.ejs file
+    });
+
+    app.post('/addMember', isLoggedIn, function (req, res) {
+        var newUser            = new User();
+        // set the user's local credentials
+        newUser.local.email      = req.param('email');
+        newUser.local.city       = req.param('city');
+        newUser.local.state      = req.param('state');
+        newUser.local.zipcode   = req.param('zipcode');
+        newUser.local.firstName  = req.param('firstName');
+        newUser.local.lastName   = req.param('lastName');
+        newUser.local.phone      = req.param('phone');
+        newUser.local.address    = req.param('address');
+        newUser.local.password   = newUser.generateHash(req.param('password'));
+        newUser.local.createDate = new Date();
+        newUser.local.userType   = req.param('userType');
+        newUser.local.expireDate = new Date();
+        newUser.local.balance    = 0;
+        newUser.local.availableCopy = 2;
+        newUser.local.checkedOutCopy = 0;
+        if(req.param('userType') == "Simple"){
+            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
+        }else{
+            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+31);
+        }
+
+        newUser.save();
+        var pathName = '/profile/'+ req.param('email');
+        res.redirect(pathName);
+
+    });
+
+
+    //search members based on attributes
+    app.post('/searchMember', isLoggedIn, function (req, res) {
+
+        var name = 'local.' + req.param('searchparam');
+        var value = {'$regex': req.param('str'), $options: 'i'};
+        var query = {};
+        query[name] = value;
+
+        console.log(query);
+
+        User.find(query, function (err, users) {
+            if (err) {
+            }
+            ;
+            res.render('searchMember.ejs', {
+                users: users
+            });
+        });
+
+    });
+
+    //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
+    app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
+
+        var memberDay = new Date();
+
+        User.findOne({"local.email": req.params.id}, function (err, user) {
+            //console.log(user.local.checkedOutCopy);
+            var checkedOutCopy = user.local.checkedOutCopy;
+            var availableCopy = 0;
+            if(req.params.type == "Simple"){
+                if (checkedOutCopy >= 10 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 10 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+31);
+                User.update({"local.email": req.params.id},{"local.userType": "Premium","local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }else{
+                if (checkedOutCopy >= 2 ){
+                    availableCopy = 0;
+                }else{
+                    availableCopy = 2 - checkedOutCopy;
+                }
+                memberDay.setDate(memberDay.getDate()+365);
+                User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.availableCopy": availableCopy, "local.createDate":new Date(),
+                    "local.expireDate":memberDay}).exec();
+
+
+            }
+
+
+        });
+
+        var pathName = pathName = '/profile/'+ req.params.id;
+        res.redirect(pathName);
+    });
+
+
     //user first sign up
     app.get('/register', isLoggedIn, function (req, res) {
         User.findOne({user_id: req.user.id}, function(err, user) {
@@ -84,86 +183,6 @@ module.exports = function (app, passport) {
     });
 
 
-    //change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
-    app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
-
-        var memberDay = new Date();
-
-        User.findOne({"local.email": req.params.id}, function (err, user) {
-            //console.log(user.local.checkedOutCopy);
-            var checkedOutCopy = user.local.checkedOutCopy;
-            var availableCopy = 0;
-            if(req.params.type == "Simple"){
-                if (checkedOutCopy >= 10 ){
-                    availableCopy = 0;
-                }else{
-                    availableCopy = 10 - checkedOutCopy;
-                }
-                memberDay.setDate(memberDay.getDate()+31);
-                User.update({"local.email": req.params.id},{"local.userType": "Premium","local.availableCopy": availableCopy, "local.createDate":new Date(),
-                    "local.expireDate":memberDay}).exec();
-
-
-            }else{
-                if (checkedOutCopy >= 2 ){
-                    availableCopy = 0;
-                }else{
-                    availableCopy = 2 - checkedOutCopy;
-                }
-                memberDay.setDate(memberDay.getDate()+365);
-                User.update({"local.email": req.params.id},{"local.userType": "Simple", "local.availableCopy": availableCopy, "local.createDate":new Date(),
-                    "local.expireDate":memberDay}).exec();
-
-
-            }
-
-
-        });
-
-        var pathName = pathName = '/profile/'+ req.params.id;
-        res.redirect(pathName);
-    });
-
-
-
-    //add new member
-    app.get('/addMember', isLoggedIn, function (req, res) {
-        res.render('addmember.ejs'); // load the index.ejs file
-    });
-
-    app.post('/addMember', isLoggedIn, function (req, res) {
-        var newUser            = new User();
-        // set the user's local credentials
-        newUser.local.email      = req.param('email');
-        newUser.local.city       = req.param('city');
-        newUser.local.state      = req.param('state');
-        newUser.local.zipcode   = req.param('zipcode');
-        newUser.local.firstName  = req.param('firstName');
-        newUser.local.lastName   = req.param('lastName');
-        newUser.local.phone      = req.param('phone');
-        newUser.local.address    = req.param('address');
-        newUser.local.password   = newUser.generateHash(req.param('password'));
-        newUser.local.createDate = new Date();
-        newUser.local.userType   = req.param('userType');
-        newUser.local.expireDate = new Date();
-        newUser.local.balance    = 0;
-        newUser.local.availableCopy = 2;
-        newUser.local.checkedOutCopy = 0;
-        if(req.param('userType') == "Simple"){
-            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+365);
-        }else{
-            newUser.local.expireDate.setDate(newUser.local.expireDate.getDate()+31);
-        }
-
-        newUser.save();
-        var pathName = '/profile/'+ req.param('email');
-        res.redirect(pathName);
-
-    });
-
-
-
-
     //view individual profile
     app.get('/profile/:id', isLoggedIn, function (req, res) {
 
@@ -178,25 +197,35 @@ module.exports = function (app, passport) {
 
     //modify profile
     app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
-        User.findOne({"local.email": req.params.id}, function (err, user) {
-            if (err) {
-            };
+
+        connection.query('SELECT * FROM user WHERE userId = ' + req.params.id, function(err, rows, fields) {
+            if (err) {};
             res.render('modifyprofile.ejs', {
-                user: user
+                user: rows[0]
             });
+
         });
+
     });
 
     app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
-        User.update({"local.email": req.params.id},{"local.firstName": req.param('firstName'), "local.lastName":req.param('lastName'),
-            "local.address":req.param('address'), "local.phone":req.param('phone')}).exec();
+
+        connection.query('UPDATE user SET firstName = "' + req.param('firstName')
+            + '", lastName = "' + req.param('lastName') + '", address = "'+ req.param('address')
+            +'", phone =" ' + req.param('phone') +'", city = "'+ req.param('city') +'", state ="'
+            + req.param('state') + '", zipcode =" ' + req.param('zipcode') +'" WHERE userId = "'
+            + req.params.id +'"', function(err, rows, fields) {
+
+        });
+
         var pathName = '/profile/'+ req.params.id;
         res.redirect(pathName);
     });
 
     //delete individual member
     app.get('/destroy/:id', isLoggedIn, function (req, res) {
-        User.remove({"local.email": req.params.id}).exec();
+        User.remove({"local.userId": req.params.id}).exec();
+        connection.query('DELETE FROM user WHERE userId = '+ req.params.id);
         res.redirect('/searchMember');
     });
 
@@ -211,59 +240,8 @@ module.exports = function (app, passport) {
             });
         });
 
-//        User.find({ "local.userType": { $ne: "admin" } },function (err, users) {
-//            if (err) {
-//            }
-//            ;
-//            res.render('searchMember.ejs', {
-//                users: users
-//            });
-//        });
 
     });
-
-    //search members based on attributes
-    app.post('/searchMember', isLoggedIn, function (req, res) {
-
-        var name = 'local.' + req.param('searchparam');
-        var value = {'$regex': req.param('str'), $options: 'i'};
-        var query = {};
-        query[name] = value;
-
-        console.log(query);
-
-        User.find(query, function (err, users) {
-            if (err) {
-            }
-            ;
-            res.render('searchMember.ejs', {
-                users: users
-            });
-        });
-
-    });
-
-
-    //view all members
-//    app.get('/memberAll', isLoggedIn, function (req, res) {
-//
-//        User.find({}, function (err, users) {
-//            if (err) {
-//                console.log('error occured');
-//                return;
-//            }
-//            GLOBAL.count=GLOBAL.count+1;
-//            res.render('memberAll.ejs', {
-//                users: users,
-//            });
-//        });
-//
-//    });
-
-//    app.post('/memberAll', isLoggedIn, function (req, res) {
-//        res.redirect('/memberAll');
-//    });
-
 
 
 //****************************************************************
