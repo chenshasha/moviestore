@@ -274,9 +274,9 @@ module.exports = function (app, passport) {
 //****************************************************************
 // Movie Management
 //****************************************************************
-    //Create New Movie
+    //Create New Movie mongo db
 
-    app.get('/createMovie', isLoggedIn, function (req, res) {
+   /* app.get('/createMovie', isLoggedIn, function (req, res) {
         res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
@@ -305,7 +305,37 @@ module.exports = function (app, passport) {
             var pathName = '/viewMoviePage/'+ newMovie._id;
             res.redirect(pathName);
         });
+    });*/
+    
+    // create movie mysql
+    app.get('/createMovie', isLoggedIn, function (req, res) {
+        res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
+    app.post('/createMovie', isLoggedIn, function (req, res) {
+    	var Id     = Math.floor(Math.random() * 1000000000);
+        var MovieName      = req.param('movie_name');
+        var MovieBanner   = req.param('banner');
+        var ReleaseDate    = req.param('releaseDate');
+        var RentAmount       = req.param('rentAmount');
+        var AvailableCopies     = req.param('availableCopies');
+       // var category    = req.param('category');
+      
+        if(req.param('category') == "other"){
+            var category=req.param('other');
+        }else{
+        	var category=req.param('category');
+        }
+
+        connection.query('INSERT movies ' +
+            '(id, MovieName, MovieBanner, ReleaseDate, RentAmount, AvailableCopies, category) VALUES ('+
+           Id + ',"' +  MovieName  +'","'+ MovieBanner+ '",' + ReleaseDate +',' + RentAmount+ ','+ AvailableCopies + ',"'+ category + '")', function(err, rows, fields) {
+        	
+        });
+        var pathName = '/viewMoviePage/'+Id;
+        res.redirect(pathName);
+    
+    });
+    
 //***************************************************************
     //delete individual movie
 
@@ -315,7 +345,7 @@ module.exports = function (app, passport) {
     });
     //***************************************************************
     //search movie for members
-    app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
+   /* app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
         var twisted = function(res){
             return function(err, movies){
                 if (err){
@@ -332,10 +362,12 @@ module.exports = function (app, passport) {
         query[name] = value;
         console.log(query);
         Movie.find(query, twisted(res));
-    });
+    });*/
+    
+   
 
 
-    app.get('/searchMovieForMembers', isLoggedIn, function (req, res) {
+   /* app.get('/searchMovieForMembers', isLoggedIn, function (req, res) {
         var twisted = function(res){
             return function(err, movies){
                 if (err){
@@ -347,7 +379,7 @@ module.exports = function (app, passport) {
         }
         Movie.find({}, twisted(res)).limit(100);
     });
-
+*/
 
     //***************************************************************
     //view movie for members
@@ -385,7 +417,7 @@ module.exports = function (app, passport) {
     });
 
 //*******************************************
-    app.post('/searchMovie', isLoggedIn, function (req, res) {
+  /*  app.post('/searchMovie', isLoggedIn, function (req, res) {
         var twisted = function(res){
             return function(err, movies){
                 if (err){
@@ -415,15 +447,50 @@ module.exports = function (app, passport) {
             }
         }
         Movie.find({}, twisted(res)).limit(100);
+    });*/
+    //serch movies for members mysql
+    app.post('/searchMovie', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, movies, fields) {
+            if (err) {
+            };
+            res.render('searchMovie.ejs', {
+                movies: movies
+            });
+        });
+
+    });
+    app.get('/searchMovie', function(req, res) {
+
+        connection.query('SELECT * from movies', function(err, movies, fields) {
+
+            res.render('searchMovie.ejs', {
+                movies: movies
+            });
+        });
+
+
     });
 
+
     //view individual movie
-    app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({_id: req.params.id}, function (err,movies) {
+    //mongodb
+    /*app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
+        Movie.findOne({id: req.params.id}, function (err,movies) {
             if (err) {};
             res.render('viewMoviePage.ejs', {movies: movies});
 
         });
+    });*/
+    //view individual movie mysql
+    app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, rows, fields) {
+            if (err) {};
+            res.render('viewMoviePage.ejs', {movies: rows[0]});
+
+        });
+
     });
 //***************************************************************
     //modify movie
