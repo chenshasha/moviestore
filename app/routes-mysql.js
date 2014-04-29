@@ -113,7 +113,7 @@ module.exports = function (app, passport) {
         var memberDay = new Date();
         var availableCopy = 0;
         var userType;
-        connection.query('SELECT * from user WHERE userId =' + req.params.id, function(err, rows, fields) {
+        connection.query('SELECT * from user WHERE userId ="' + req.params.id +'"', function(err, rows, fields) {
             var checkedOutCopy = rows[0].checkedOutCopy;
             availableCopy = 0;
             if(req.params.type == "Simple"){
@@ -240,10 +240,10 @@ module.exports = function (app, passport) {
     //modify profile
     app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
 
-        connection.query('SELECT * FROM user WHERE userId = ' + req.params.id, function(err, rows, fields) {
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
             if (err) {};
             res.render('modifyprofile.ejs', {
-                user: rows[0]
+                user: user[0]
             });
 
         });
@@ -267,7 +267,7 @@ module.exports = function (app, passport) {
     //delete individual member
     app.get('/destroy/:id', isLoggedIn, function (req, res) {
         User.remove({"local.userId": req.params.id}).exec();
-        connection.query('DELETE FROM user WHERE userId = '+ req.params.id);
+        connection.query('DELETE FROM user WHERE userId = "'+ req.params.id + '"');
         res.redirect('/searchMember');
     });
 
