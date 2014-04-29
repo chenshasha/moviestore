@@ -509,9 +509,9 @@ module.exports = function (app, passport) {
     });
 //***************************************************************
     //modify movie
+//mongodb
 
-
-    app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
+   /* app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
         Movie.findOne({_id: req.params.id}, function (err, movies) {
             if (err) {
             };
@@ -527,6 +527,34 @@ module.exports = function (app, passport) {
         var pathName = '/viewMoviePage/'+ req.params.id;
         res.redirect(pathName);
 
+    });*/
+    
+    // modify movie mysql
+    
+    //modify profile
+    app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM movies WHERE id = '+ req.params.id +'', function(err, rows, fields) {
+            if (err) {};
+            res.render('modifyMovie.ejs', {
+                movies: rows[0]
+            });
+
+        });
+
+    });
+
+    app.post('/modifyMovie/:id', isLoggedIn, function (req, res) {
+
+        connection.query('UPDATE movies SET id='+req.param('movieID')+', MovieName = "'+ req.param('movie_name')
+            +'", MovieBanner = "' + req.param('banner') + '", ReleaseDate = '+ req.param('releaseDate')
+            +', RentAmount = ' + req.param('rentAmount') +', AvailableCopies = '+ req.param('availableCopies') +', category ="'
+            + req.param('category') +'" WHERE id = '+req.param('movieID')+'', function(err, rows, fields) {
+
+        });
+
+        var pathName = '/viewMoviePage/'+ req.params.id;
+        res.redirect(pathName);
     });
 
 
