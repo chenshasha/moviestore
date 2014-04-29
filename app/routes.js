@@ -72,6 +72,7 @@ module.exports = function (app, passport) {
     app.get('/addMember', isLoggedIn, function (req, res) {
         res.render('addmember.ejs'); // load the index.ejs file
     });
+
     app.post('/addMember', isLoggedIn, function (req, res) {
         var newUser            = new User();
         // set the user's local credentials
