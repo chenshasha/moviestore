@@ -60,17 +60,9 @@ module.exports = function (app, passport) {
     //search members based on attributes
     app.post('/searchMember', isLoggedIn, function (req, res) {
 
-        var name = 'local.' + req.param('searchparam');
-        var value = {'$regex': req.param('str'), $options: 'i'};
-        var query = {};
-        query[name] = value;
-
-        console.log(query);
-
-        User.find(query, function (err, users) {
+        connection.query('SELECT * from user WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, users, fields) {
             if (err) {
-            }
-            ;
+            };
             res.render('searchMember.ejs', {
                 users: users
             });
