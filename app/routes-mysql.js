@@ -101,8 +101,10 @@ module.exports = function (app, passport) {
     //search members based on attributes
     app.post('/searchMember', isLoggedIn, function (req, res) {
 
+
         connection.query('SELECT * from user WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, users, fields) {
             if (err) {
+                res.redirect('/searchMember');
             };
             res.render('searchMember.ejs', {
                 users: users
@@ -194,6 +196,25 @@ module.exports = function (app, passport) {
 
     });
 
+    app.get('/issue/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+            if (err) {};
+            res.render('issueMovie.ejs', {
+                user: user[0]
+            });
+
+        });
+
+    });
+    
+    
+    
+    
+    
+    
+    
+    
     app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
 
         connection.query('UPDATE user SET firstName = "' + req.param('firstName')

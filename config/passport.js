@@ -148,7 +148,7 @@ module.exports = function(passport) {
 
                 req.session.email = user.local.email;
                 req.session.userId = user.local.userId;
-                
+
                 return done(null, user);
             });
 
