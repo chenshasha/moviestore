@@ -359,6 +359,7 @@ module.exports = function (app, passport) {
               res.render('viewMoviePage.ejs', {movies: movies});
 
             });
+        
     });   
 //***************************************************************
   //modify movie

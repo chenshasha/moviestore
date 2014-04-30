@@ -51,7 +51,7 @@
                 </tbody>
             </table>
            
-<a href="/modifyMovie/<%= movies._id %>" class="btn btn-primary">Modify Movie  </a>
+<a href="/modifyMovie/<%= movies.id %>" class="btn btn-primary">Modify Movie  </a>
             <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
 
            
@@ -59,6 +59,7 @@
 
             </div>
     </form>
+
 
 
 </div>
@@ -72,7 +73,7 @@ function confirmDeletion() {
  
   if (confirm(confirmmessage)) {
       alert("Movie Deleted ");
-      window.location = "/deleteMovie/<%= movies._id %>"
+      window.location = "/deleteMovie/<%= movies.id %>"
  
   } else {
  
