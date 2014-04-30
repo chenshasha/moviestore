@@ -496,6 +496,7 @@ module.exports = function (app, passport) {
                 movies: movies[0]
             });
 
+            
         });
 
     });
