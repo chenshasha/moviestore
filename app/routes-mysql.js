@@ -276,6 +276,7 @@ module.exports = function (app, passport) {
         if(req.param('category') == "other"){
             var category=req.param('other');
         }else{
+        	
         	var category=req.param('category');
         }
 
