@@ -230,48 +230,21 @@ module.exports = function (app, passport) {
     });
 
 
-//****************************************************************
+//********************************************************************************************
 // Movie Management
-//****************************************************************
-    //Create New Movie mongo db
-
-   /* app.get('/createMovie', isLoggedIn, function (req, res) {
-        res.render('createMovie.ejs'); // load the createMovie.ejs file
-    });
-    app.post('/createMovie', isLoggedIn, function (req, res) {
-        var newMovie            = new Movie();
-        var total=0;
-
-        Movie.count({id:{$exists:true}},function(err,count){
-
-            newMovie.id				= count+1;//to  increment the id
-            newMovie .MovieName  	= req.param('movie_name');
-            newMovie .MovieBanner  	= req.param('banner');
-            newMovie .ReleaseDate   = req.param('releaseDate');
-            newMovie .RentAmount  		= req.param('rentAmount');
-            newMovie .AvailableCopies  	= req.param('availableCopies');
-            //newMovie.category 		= req.param('category');
-
-            if(req.param('category') === "other"){
-                newMovie.category = req.param('other');
-            }
-            else newMovie.category 		= req.param('category');
-
-
-            newMovie.save();
-            console.log(newMovie._id);
-
-            var pathName = '/viewMoviePage/'+ newMovie._id;
-            res.redirect(pathName);
-        });
-    });*/
+//********************************************************************************************
     
-    // create movie mysql
+    // create movie 
     app.get('/createMovie', isLoggedIn, function (req, res) {
         res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
-    	var Id     = Math.floor(Math.random() * 1000000000);
+    	 connection.query('select id from movies where id=(select max(id) from movies)',function(err, result,fields){
+    		
+    	    	//console.log(result[0].id);
+    	
+    	var Id=result[0].id+1;
+    	
         var MovieName      = req.param('movie_name');
         var MovieBanner   = req.param('banner');
         var ReleaseDate    = req.param('releaseDate');
@@ -286,136 +259,88 @@ module.exports = function (app, passport) {
         }
 
         connection.query('INSERT movies ' +
-            '(id, MovieName, MovieBanner, ReleaseDate, RentAmount, AvailableCopies, category) VALUES ('+
-           Id + ',"' +  MovieName  +'","'+ MovieBanner+ '",' + ReleaseDate +',' + RentAmount+ ','+ AvailableCopies + ',"'+ category + '")', function(err, rows, fields) {
+            '( MovieName, MovieBanner, ReleaseDate, RentAmount, AvailableCopies, category) VALUES ("'+
+           MovieName +'","'+ MovieBanner+ '",' + ReleaseDate +',' + RentAmount+ ','+ AvailableCopies + ',"'+ category + '")', function(err, rows, fields) {
         	
         });
         var pathName = '/viewMoviePage/'+Id;
         res.redirect(pathName);
-    
+    	 });
     });
     
 //***************************************************************
-    //delete individual movie
-    //mongodb
-
-   /* app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
-        Movie.remove({_id: req.params.id}).exec();
-        res.redirect('/searchMovie');
-    });*/
-    
-  //delete individual movie mysql
+   
+  //delete individual movie 
     app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
        
         connection.query('DELETE FROM movies WHERE id = '+ req.params.id);
         res.redirect('/searchMovie');
     });
     //***************************************************************
-    //search movie for members
-   /* app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
-        var twisted = function(res){
-            return function(err, movies){
-                if (err){
-                    console.log('error occured');
-                    return;
-                }
-                res.render('searchMovieForMembers.ejs', {movies: movies});
-            }
-        }
-        var name = req.param('searchparam');
-        var value = {'$regex': req.param('str'),$options: 'i'};
-        if (req.param('searchparam')=="id" || req.param('searchparam')=="ReleaseDate" || req.param('searchparam')=="RentAmt" || req.param('searchparam')=="AvlCopies"){value=req.param('str');}
-        var query = {};
-        query[name] = value;
-        console.log(query);
-        Movie.find(query, twisted(res));
-    });*/
-    
-   
+    //Search movie for members
+    app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
+    	//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
+    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+    	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
+        connection.query(qry, function(err, movies, fields) {
+            if (err) {
+            };
+            console.log("in post");
+            res.render('searchMovieForMembers.ejs', {
+                movies: movies
+            });
+        });
 
-
-   /* app.get('/searchMovieForMembers', isLoggedIn, function (req, res) {
-        var twisted = function(res){
-            return function(err, movies){
-                if (err){
-                    console.log('error occured');
-                    return;
-                }
-                res.render('searchMovieForMembers.ejs', {movies: movies});
-            }
-        }
-        Movie.find({}, twisted(res)).limit(100);
     });
-*/
+    app.get('/searchMovieForMembers', function(req, res) {
+    	console.log("in get");
+        connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
+
+            res.render('searchMovieForMembers.ejs', {
+                movies: movies
+            });
+        });
+
+
+    });
+
 
     //***************************************************************
-    //view movie for members
-
+   //view For members
+    
     app.get('/movie-view-only/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({id: req.params.id}, function (err,movies) {
-            if (err) {};
-            res.render('movie-view-only.ejs', {movies: movies});
 
+        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
+            if (err) {};
+            res.render('movie-view-only.ejs', {movies: movies[0]});
 
         });
+
     });
 
 
     //***************************************************************
 
     //view all movies
-    app.get('/movieall', isLoggedIn, function (req, res) {
-        var twisted = function(res){
-            return function(err, movie){
-                if (err){
-                    console.log('error occured');
-                    return;
-                }
-                GLOBAL.count=GLOBAL.count+1;
-                res.render('movie.ejs', {movie: movie, count: GLOBAL.count});
-            }
-        }
+    app.get('/movieall', function(req, res) {
 
-        Movie.find({}, twisted(res));
-    });
+        connection.query('SELECT * from movies', function(err, movies, fields) {
+
+        	GLOBAL.count=GLOBAL.count+1;
+            res.render('movie.ejs', {movies: movies, count: GLOBAL.count});
+            });
+        });
+
+
+   
     app.post('/movieall', isLoggedIn, function (req, res) {
         res.redirect('/movieall');
 
     });
 
 //*******************************************
-  /*  app.post('/searchMovie', isLoggedIn, function (req, res) {
-        var twisted = function(res){
-            return function(err, movies){
-                if (err){
-                    console.log('error occured');
-                    return;
-                }
-                res.render('searchMovie.ejs', {movies: movies});
-            }
-        }
-        var name = req.param('searchparam');
-        var value = {'$regex': req.param('str'),$options: 'i'};
-        if (req.param('searchparam')=="id" || req.param('searchparam')=="ReleaseDate" || req.param('searchparam')=="RentAmt" || req.param('searchparam')=="AvlCopies"){value=req.param('str');}
-        var query = {};
-        query[name] = value;
-        console.log(query);
-        Movie.find(query, twisted(res));
-    });
-
-    app.get('/searchMovie', isLoggedIn, function (req, res) {
-        var twisted = function(res){
-            return function(err, movies){
-                if (err){
-                    console.log('error occured');
-                    return;
-                }
-                res.render('searchMovie.ejs', {movies: movies});
-            }
-        }
-        Movie.find({}, twisted(res)).limit(100);
-    });*/
-    //serch movies for members mysql
+  
+    //serch movies for admin 
     app.post('/searchMovie', isLoggedIn, function (req, res) {
     	//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
     	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
@@ -443,16 +368,8 @@ module.exports = function (app, passport) {
     });
 
 
-    //view individual movie
-    //mongodb
-    /*app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({id: req.params.id}, function (err,movies) {
-            if (err) {};
-            res.render('viewMoviePage.ejs', {movies: movies});
-
-        });
-    });*/
-    //view individual movie mysql
+    
+    //view individual movie 
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
 
         connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
@@ -463,30 +380,7 @@ module.exports = function (app, passport) {
 
     });
 //***************************************************************
-    //modify movie
-//mongodb
-
-   /* app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
-        Movie.findOne({_id: req.params.id}, function (err, movies) {
-            if (err) {
-            };
-            res.render('modifyMovie.ejs', {
-                movies: movies
-            });
-        });
-    });
-
-    app.post('/modifyMovie/:id', isLoggedIn, function (req, res) {
-        Movie.update({_id:req.params.id},{"MovieName": req.param('movie_name'), "MovieBanner":req.param('banner'),
-            "ReleaseDate":req.param('releaseDate'), "RentAmount":req.param('rentAmount'),"AvailableCopies":req.param('availableCopies'),"category":req.param('category')}).exec();
-        var pathName = '/viewMoviePage/'+ req.params.id;
-        res.redirect(pathName);
-
-    });*/
-    
-    // modify movie mysql
-    
-    //modify movie
+       //modify movie
     
     app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
 

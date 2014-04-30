@@ -8,7 +8,7 @@
 	<form action="/movieall">
     <div class="page-header text-center">
 
-        <h1><span class="fa fa-anchor"></span> All Movies <%=movie.length%> </h1>
+        <h1><span class="fa fa-anchor"></span> All Movies <%=movies.length%> </h1>
         Showing <%=min%> to <%=max%> <button type="submit" class="btn btn-default btn-lg active">NEXT >></button>
     </div>
 
@@ -28,29 +28,27 @@
                 	<th style="width: 150px;">Category </th>
                 </tr>
                 
-                <%
                 
-				for(var k=min; k<=max; k++) {
-				if(max<movie.length){
-				%>
+              <% movies.forEach( function ( movies ){ %>
+				
     
                 <tr>
-                    <td><%= movie[k].id %><br></td>   
+                    <td><%= movies.id %><br></td>   
                                      
-                    <td><%= movie[k].MovieName %></td>
+                    <td><%= movies.MovieName %></td>
                 
-                    <td><%= movie[k].MovieBanner %><br></td>
+                    <td><%= movies.MovieBanner %><br></td>
                
-                    <td><%= movie[k].ReleaseDate %></td>
+                    <td><%= movies.ReleaseDate %></td>
                 
-                    <td><%= movie[k].RentAmount %></td>
+                    <td><%= movies.RentAmount %></td>
                 
-                    <td><%= movie[k].AvailableCopies %></td>
+                    <td><%= movies.AvailableCopies %></td>
                     
-                    <td><%= movie[k].category %></td>
+                    <td><%= movies.category %></td>
                 </tr>
                 
-                <%} }
+                <%} );
                 
                
                %>
