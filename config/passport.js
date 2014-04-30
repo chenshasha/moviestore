@@ -73,15 +73,39 @@ module.exports = function(passport) {
                     req.session.email = email;
                     req.session.userId = newUser.local.userId;
                     newUser.save();
+
+                    var userId     = newUser.local.userId;
+                    var address    = req.param('address');
+                    var city       = req.param('city');
+                    var state      = req.param('state');
+                    var zipcode    = req.param('zipcode');
+                    var firstName  = req.param('firstName');
+                    var lastName   = req.param('lastName');
+                    var phone      = req.param('phone');
+                    var createDate = new Date();
+                    var userType   = req.param('userType');
+                    var expireDate = new Date();
+                    var balance    = 0;
+                    var availableCopy = 0;
+                    var checkedOutCopy = 0;
+
+                    if(req.param('userType') == "Simple"){
+                        expireDate.setDate(expireDate.getDate()+365);
+                        availableCopy = 2;
+                    }else{
+                        expireDate.setDate(expireDate.getDate()+31);
+                        availableCopy = 10;
+                    }
+
                     connection.query('INSERT user ' +
-                        '(userId, email) VALUES ("'+
-                        newUser.local.userId+ '","' + email +'")', function(err, rows, fields) {
+                        '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance,' +
+                        'checkedOutCopy, availableCopy, address) VALUES ("'+
+                        userId+ '","' + email + '","' + city + '","' +state + '","' +zipcode + '","' + firstName + '","' + lastName
+                        + '","' + phone + '","' + createDate + '","' + userType + '","' + expireDate + '",' + balance + ',' +checkedOutCopy + ',' + availableCopy + ',"' + address +'")', function(err, rows, fields) {
                         if(err){
-                            console.log()
 
                         }
                     });
-
 
                     return done(null, newUser);
 
@@ -121,18 +145,10 @@ module.exports = function(passport) {
                 if (!user.validPassword(password))
                     return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
-                // all is well, return successful user
-
-//                user.local.lastDate = user.local.today;
-//                user.local.today    = Date.now();
-//                user.save(function(err) {
-//                    if (err)
-//                        throw err;
-//                    return done(null, user);
-//                });
 
                 req.session.email = user.local.email;
                 req.session.userId = user.local.userId;
+                
                 return done(null, user);
             });
 
