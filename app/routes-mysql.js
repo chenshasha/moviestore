@@ -7,7 +7,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : '',
+    password : 'anshul21',
     database : 'moviestore'
 });
 
@@ -194,6 +194,25 @@ module.exports = function (app, passport) {
 
     });
 
+    app.get('/issue/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+            if (err) {};
+            res.render('issueMovie.ejs', {
+                user: user[0]
+            });
+
+        });
+
+    });
+    
+    
+    
+    
+    
+    
+    
+    
     app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
 
         connection.query('UPDATE user SET firstName = "' + req.param('firstName')
