@@ -260,8 +260,8 @@ module.exports = function (app, passport) {
         res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
     app.post('/createMovie', isLoggedIn, function (req, res) {
-    	 connection.query('select id from movies where id=(select max(id) from movies)',function(err, result,fields){
-    		
+    	 
+    	connection.query('select max(id) as id from movies',function(err, result,fields){	
     	    	//console.log(result[0].id);
     	
     	var Id=result[0].id+1;
