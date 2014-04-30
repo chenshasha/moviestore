@@ -154,67 +154,6 @@ module.exports = function (app, passport) {
     });
 
 
-    //user first sign up
-    app.get('/register', isLoggedIn, function (req, res) {
-        User.findOne({user_id: req.user.id}, function(err, user) {
-            res.render('addMember-user.ejs', {
-                user : req.user
-            });
-        });
-    });
-
-    app.post('/register', isLoggedIn, function (req, res) {
-
-        // set the user's local credentials
-        var userId     = req.session.userId;
-        var email      = req.session.email;
-        var address    = req.param('address');
-        var city       = req.param('city');
-        var state      = req.param('state');
-        var zipcode    = req.param('zipcode');
-        var firstName  = req.param('firstName');
-        var lastName   = req.param('lastName');
-        var phone      = req.param('phone');
-        var createDate = new Date();
-        var userType   = req.param('userType');
-        var expireDate = new Date();
-        var balance    = 0;
-        var availableCopy = 0;
-        var checkedOutCopy = 0;
-        if(req.param('userType') == "Simple"){
-            expireDate.setDate(expireDate.getDate()+365);
-            availableCopy = 2;
-        }else{
-            expireDate.setDate(expireDate.getDate()+31);
-            availableCopy = 10;
-        }
-
-
-        connection.query('UPDATE user SET city = "' + city
-            + '", state = "' + state +'", zipcode = "' + zipcode
-            + '", firstName = "' + firstName + '", lastName = "'+ lastName + '", phone = "' + phone + '", createDate = "' + createDate + '",'
-            + 'userType = "' + userType + '", expireDate = "' + expireDate +'", balance = '+ balance +', checkedOutCopy = '+ checkedOutCopy + ',availableCopy = '
-            + availableCopy +', address = "' + address + '" WHERE userId = "'
-            + userId +'"', function(err, rows, fields) {
-
-            if(err){
-                console.log()
-
-            }
-            console.log('UPDATE user SET city = "' + city
-                + '", state = ' + state +', zipcode = "' + zipcode
-                + '", firstName = "' + firstName + '", lastName = "'+ lastName + '", phone = "' + phone + '", createDate = "' + createDate + '",'
-                + 'userType = "' + userType + '", expireDate = "' + expireDate +'", balance = '+ balance +', checkedOutCopy = '+ checkedOutCopy + ',availableCopy = '
-                + availableCopy +', address = "' + address + '" WHERE userId = "'
-                + userId +'"');
-
-            });
-
-        res.redirect('/profile-view-only');
-
-
-    });
-
     //member view profile
     app.get('/profile-view-only', isLoggedIn, function (req, res) {
         console.log('SELECT * from user WHERE userId = "' + req.session.userId + '"');
@@ -574,15 +513,6 @@ module.exports = function (app, passport) {
 //***************************************************************    
 
 
-    //direct to user page
-    app.get('/store', isLoggedIn, function (req, res) {
-        res.render('store.ejs'); // load the index.ejs file
-    });
-
-//    //direct to admin page
-//    app.get('/adminstore', isLoggedIn, function (req, res) {
-//        res.render('adminstore.ejs'); // load the index.ejs file
-//    });
 
     // =====================================
     // HOME PAGE (with login links) ========
@@ -634,7 +564,7 @@ module.exports = function (app, passport) {
 
     // process the signup form
     app.post('/signup', passport.authenticate('local-signup', {
-        successRedirect: '/register', // redirect to the secure profile section
+        successRedirect: '/profile-view-only', // redirect to the secure profile section
         failureRedirect: '/signup', // redirect back to the signup page if there is an error
         failureFlash: true // allow flash messages
     }));
