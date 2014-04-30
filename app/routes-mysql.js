@@ -478,10 +478,13 @@ module.exports = function (app, passport) {
     });*/
     //serch movies for members mysql
     app.post('/searchMovie', isLoggedIn, function (req, res) {
-
-        connection.query('SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, movies, fields) {
+    	//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
+    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+    	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
+        connection.query(qry, function(err, movies, fields) {
             if (err) {
             };
+            console.log("in post");
             res.render('searchMovie.ejs', {
                 movies: movies
             });
@@ -489,8 +492,8 @@ module.exports = function (app, passport) {
 
     });
     app.get('/searchMovie', function(req, res) {
-
-        connection.query('SELECT * from movies', function(err, movies, fields) {
+    	console.log("in get");
+        connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 
             res.render('searchMovie.ejs', {
                 movies: movies
@@ -513,9 +516,9 @@ module.exports = function (app, passport) {
     //view individual movie mysql
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
 
-        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, rows, fields) {
+        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
             if (err) {};
-            res.render('viewMoviePage.ejs', {movies: rows[0]});
+            res.render('viewMoviePage.ejs', {movies: movies[0]});
 
         });
 
@@ -544,13 +547,14 @@ module.exports = function (app, passport) {
     
     // modify movie mysql
     
-    //modify profile
+    //modify movie
+    
     app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
 
-        connection.query('SELECT * FROM movies WHERE id = '+ req.params.id , function(err, rows, fields) {
+        connection.query('SELECT * FROM movies WHERE id = '+ req.params.id , function(err, movies, fields) {
             if (err) {};
             res.render('modifyMovie.ejs', {
-                movies: rows[0]
+                movies: movies[0]
             });
 
         });
@@ -559,14 +563,19 @@ module.exports = function (app, passport) {
 
     app.post('/modifyMovie/:id', isLoggedIn, function (req, res) {
 
-        connection.query('UPDATE movies SET id='+req.param('movieID')+', MovieName = "'+ req.param('movie_name')
+    	var movie_id=req.params.id;
+    	var name=req.param('movie_name');
+    	console.log(name);
+        connection.query('UPDATE movies SET  MovieName = "'+ req.param('movie_name')
             +'", MovieBanner = "' + req.param('banner') + '", ReleaseDate = '+ req.param('releaseDate')
             +', RentAmount = ' + req.param('rentAmount') +', AvailableCopies = '+ req.param('availableCopies') +', category ="'
-            + req.param('category') +'" WHERE id = "'+req.param('movieID')+'"', function(err, rows, fields) {
+            + req.param('category') +'" WHERE id =' + req.params.id, function(err, rows, fields) {
+        	if (err) {console.log('Query unsuccessful');};
 
         });
+        connection.query('commit');
 
-        var pathName = '/viewMoviePage/'+ req.params.id;
+        var pathName = '/viewMoviePage/'+ movie_id;
         res.redirect(pathName);
     });
 
