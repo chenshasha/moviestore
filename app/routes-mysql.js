@@ -7,7 +7,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : 'anshul21',
+    password : '',
     database : 'moviestore'
 });
 
@@ -101,8 +101,10 @@ module.exports = function (app, passport) {
     //search members based on attributes
     app.post('/searchMember', isLoggedIn, function (req, res) {
 
+
         connection.query('SELECT * from user WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, users, fields) {
             if (err) {
+                res.redirect('/searchMember');
             };
             res.render('searchMember.ejs', {
                 users: users
