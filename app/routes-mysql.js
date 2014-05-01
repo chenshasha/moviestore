@@ -110,10 +110,29 @@ module.exports = function (app, passport) {
     app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
     	var userid=req.params.uid;
     	var movieid=req.params.mid;
-        connection.query('SELECT * FROM movies', function(err, movies, fields) {
-            if (err) {};
-            console.log('uid='+req.params.uid+'mid='+req.params.mid);
-            //res.render('newPage.ejs', {movies: movies});
+    	connection.query('update movies set userId= "' +
+                req.params.uid+ '"where id='+req.params.mid+'', function(err, rows, fields) {
+
+            });
+    	console.log('update movies set userId= "' +
+                req.params.uid+ '" where id='+req.params.mid+'');
+       // connection.query('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"', function(err, movies, fields) {
+            //if (err) {};
+           // console.log('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"');
+          //  console.log('uid='+req.params.uid+'mid='+req.params.mid);
+            var pathName = '/checkoutPage/'+ userid;
+            res.redirect(pathName);
+        });
+
+ 
+    
+    app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM user join movies on movies.userId = user.userId where movies.userId="'+req.params.id+'"', function(err, joins, fields) {
+           
+            	 if (err) {};
+            res.render('checkoutPage.ejs', {joins: joins});
+       
         });
 
     });
@@ -224,9 +243,13 @@ module.exports = function (app, passport) {
     });
 
     app.get('/issue/:id', isLoggedIn, function (req, res) {
+    	connection.query('update movies set userId= "' +
+                req.params.id+ '")', function(err, rows, fields) {
 
+            });
         connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
             if (err) {};
+            console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
             res.render('issueMovie.ejs', {
                 user: user[0], searchres: ''
             });
