@@ -95,6 +95,7 @@ module.exports = function(passport) {
                     }else{
                         expireDate.setDate(expireDate.getDate()+31);
                         availableCopy = 10;
+                        balance = 10;
                     }
 
                     connection.query('INSERT user ' +

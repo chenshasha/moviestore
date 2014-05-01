@@ -65,6 +65,7 @@ module.exports = function (app, passport) {
                 }else{
                     expireDate.setDate(expireDate.getDate()+31);
                     availableCopy = 10;
+                    balance = 10;
                 }
 
                 connection.query('INSERT user ' +
@@ -120,17 +121,22 @@ module.exports = function (app, passport) {
         var memberDay = new Date();
         var availableCopy = 0;
         var userType;
+        var newBalance = 0;
         connection.query('SELECT * from user WHERE userId ="' + req.params.id +'"', function(err, rows, fields) {
             var checkedOutCopy = rows[0].checkedOutCopy;
+            var oldBalance = rows[0].balance;
             availableCopy = 0;
             if(req.params.type == "Simple"){
                 if (checkedOutCopy >= 10 ){
                     availableCopy = 0;
+
                 }else{
                     availableCopy = 10 - checkedOutCopy;
+
                 }
                 memberDay.setDate(memberDay.getDate()+31);
                 userType = "Premium";
+                newBalance = oldBalance + 10;
 
             }else{
                 if (checkedOutCopy >= 2 ){
@@ -140,9 +146,11 @@ module.exports = function (app, passport) {
                 }
                 memberDay.setDate(memberDay.getDate()+365);
                 userType = "Simple";
+                newBalance = oldBalance;
             }
             connection.query('UPDATE user SET userType = "' + userType
                 + '", availableCopy = ' + availableCopy
+                + ', balance = ' + newBalance
                 +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
                 + req.params.id +'"', function(err, rows, fields) {
 
