@@ -305,7 +305,7 @@ module.exports = function (app, passport) {
     	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam')  + ' like "%' + req.param('str')+'%"';
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
         connection.query(qry, function(err, movies, fields) {
-            if (err) {
+            if (err) { res.redirect('/searchMovieForMembers')
             };
             console.log("in post");
             res.render('searchMovieForMembers.ejs', {
@@ -368,19 +368,34 @@ module.exports = function (app, passport) {
     	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+'';
     	
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
-    	console.log(qry);
+    	//console.log(qry);
         connection.query(qry, function(err, movies, fields) {
-            if (err) {console.log('query unsuccessful');
+            if (err) { 
+            	 res.redirect('/searchMovie');
+            	 console.log('query unsuccessful');
             };
+            if(movies.length === 0){
+               // console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
+                console.log('no id');
+                //flash the message
+            	req.flash("No such Id', 'That id does not exist");
+
+                res.render('searchMovie.ejs', { message: req.flash('noid') });
+
+            }else{
+            
             console.log("in post");
             res.render('searchMovie.ejs', {
                 movies: movies
             });
+            };
         });
+       
 
     });
     app.get('/searchMovie', function(req, res) {
     	console.log("in get");
+    	
         connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 
             res.render('searchMovie.ejs', {
