@@ -1,5 +1,4 @@
 // app/routes.js
-
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
@@ -379,12 +378,13 @@ module.exports = function (app, passport) {
     //***************************************************************
 
     //view all movies
-    app.get('/movieall', function(req, res) {
-
-        connection.query('SELECT * from movies', function(err, movies, fields) {
-
-        	GLOBAL.count=GLOBAL.count+1;
-            res.render('movie.ejs', {movies: movies, count: GLOBAL.count});
+    app.get('/movieall/:cnt', function(req, res) {
+    	var low=0;
+    	low=(req.params.cnt * 20) - 20;
+        connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
+        console.log('low='+low);
+        	//GLOBAL.count=GLOBAL.count+1;
+            res.render('movie.ejs', {movies: movies ,cnt: req.params.cnt});
             });
         });
 

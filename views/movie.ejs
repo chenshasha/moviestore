@@ -1,21 +1,51 @@
+<script>
+function incr()
+{
+	var txt=document.getElementById('count1');
+	txt.value++;
+	//document.getElementById('count1').value=document.getElementById('count1').value+1;
+	var str1="/movieall/";
+	var str2=document.getElementById('count1').value;
+	document.getElementById('myform').action=str1.concat(str2);
+	document.getElementById('myform').submit();
+}
+function decr()
+{
+	var txt=document.getElementById('count1');
+	if(txt.value>1){txt.value--;}
+	var str1="/movieall/";
+	var str2=document.getElementById('count1').value;
+	document.getElementById('myform').action=str1.concat(str2);
+	document.getElementById('myform').submit();
+}
+</script>
 <%- include adminheader %>
 <div style="padding:30px">
 </div>
-<% var min,max;
-				max=count*100;
-				min=max-100; %>
-<div class="container">
-	<form action="/movieall">
-    <div class="page-header text-center">
 
-        <h1><span class="fa fa-anchor"></span> All Movies <%=movies.length%> </h1>
-        Showing <%=min%> to <%=max%> <button type="submit" class="btn btn-default btn-lg active">NEXT >></button>
+<div class="container">
+	<form action="" id="myform" name="myform">
+    <div class="page-header text-center">
+		<input type="hidden" id="count1" name="count1" value="<%=cnt%>">
+        <h1><span class="fa fa-anchor"></span> All Movies </h1>
+        <div>
+        <h4> 
+        <button type="submit" class="btn btn-default btn-lg active" onclick="decr()"><< PREV </button>
+        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <%
+        var high=cnt * 20;
+    	var low= high - 20; %>
+    	Showing <%=low%> to <%=high%>
+    	&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+        <button type="submit" class="btn btn-default btn-lg active" onclick="incr()">NEXT >></button>
+        </h4>
+        </div>
     </div>
 
 
     
    
-        <div class="col-md-6 col-md-offset-3">
+        <div class="centered">
             <table class="table table-bordered table-hover">
                 <tbody style="text-align:left;">
                 <tr>
@@ -27,6 +57,8 @@
                 	<th style="width: 150px;">AvlCopies </th>
                 	<th style="width: 150px;">Category </th>
                 </tr>
+                
+                   
                 
                 
               <% movies.forEach( function ( movies ){ %>
