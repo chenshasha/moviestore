@@ -7,29 +7,45 @@
         $('#searchparam').change(function() {
             if($('#searchparam').val() == "zipcode"){
                 $("#str").attr('pattern', '[0-9]{5}|[0-9]{5}-[0-9]{4}');
+                $("#str").attr('title', 'Please enter valid zip code (Format: 99999 or 99999-9999)');
             }
             else if($('#searchparam').val() == "email"){
                 $("#str").attr('pattern', '[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$');
+                $("#str").attr('title', 'Please enter valid email');
+
+            }
+            else if($('#searchparam').val() == "userId"){
+                $("#str").attr('pattern', '[0-9]{3}-[0-9]{2}-[0-9]{4}');
+                $("#str").attr('title', 'Please enter valid member ID (Format: 999-99-9999)');
+
             }
             else if($('#searchparam').val() == "phone"){
                 $("#str").attr('pattern', '[0-9]{10}');
+                $("#str").attr('title', 'Please enter valid phone number');
+
             }
             else if($('#searchparam').val() == "address"){
                 $("#str").removeAttr('pattern');
+                $("#str").removeAttr('title');
             }
             else if($('#searchparam').val() == "city"){
                 $("#str").removeAttr('pattern');
+                $("#str").removeAttr('title');
             }
             else if($('#searchparam').val() == "state"){
+                $("#str").removeAttr('pattern');
                 $("#str").removeAttr('pattern');
             }
             else if($('#searchparam').val() == "firstName"){
                 $("#str").removeAttr('pattern');
+                $("#str").removeAttr('pattern');
             }
             else if($('#searchparam').val() == "lastName"){
                 $("#str").removeAttr('pattern');
+                $("#str").removeAttr('pattern');
             }
             else if($('#searchparam').val() == "userType"){
+                $("#str").removeAttr('pattern');
                 $("#str").removeAttr('pattern');
             }
 
@@ -75,7 +91,7 @@
   		</select>
         <div class="form-group">
             <label class="sr-only">Search String</label>
-            <input type="text" class="form-control" pattern = "[0-9]{3}-[0-9]{2}-[0-9]{4}" placeholder="Enter Search String" id="str" name="str">
+            <input type="text" class="form-control" pattern = "[0-9]{3}-[0-9]{2}-[0-9]{4}" title = "Please enter valid member ID (Format: 999-99-9999)" placeholder="Enter Search String" id="str" name="str">
         </div>
  		<button type="submit" class="btn btn-primary">Search</button>
 	</form>
