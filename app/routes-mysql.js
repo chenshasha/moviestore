@@ -10,7 +10,6 @@ var connection = mysql.createConnection({
     database : 'moviestore'
 });
 
-GLOBAL.count=0;
 
 module.exports = function (app, passport) {
     connection.connect();
@@ -97,6 +96,10 @@ module.exports = function (app, passport) {
 
     });
 
+ //****************************************************************
+ // Transaction Management
+ //****************************************************************
+        
     app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
 
         connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
@@ -378,7 +381,7 @@ module.exports = function (app, passport) {
     //***************************************************************
 
     //view all movies
-    app.get('/movieall/:cnt', function(req, res) {
+    app.get('/movieall/:cnt',isLoggedIn, function(req, res) {
     	var low=0;
     	low=(req.params.cnt * 20) - 20;
         connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
@@ -538,7 +541,6 @@ module.exports = function (app, passport) {
     // =====================================
     app.get('/logout', function (req, res) {
         req.logout();
-
         res.redirect('/');
 
     });

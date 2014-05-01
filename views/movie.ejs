@@ -41,11 +41,8 @@ function decr()
         </h4>
         </div>
     </div>
-
-
     
-   
-        <div class="centered">
+    <div class="centered">
             <table class="table table-bordered table-hover">
                 <tbody style="text-align:left;">
                 <tr>
@@ -58,12 +55,7 @@ function decr()
                 	<th style="width: 150px;">Category </th>
                 </tr>
                 
-                   
-                
-                
-              <% movies.forEach( function ( movies ){ %>
-				
-    
+                <% movies.forEach( function ( movies ){ %>
                 <tr>
                     <td><%= movies.id %><br></td>   
                                      
@@ -78,20 +70,10 @@ function decr()
                     <td><%= movies.AvailableCopies %></td>
                     
                     <td><%= movies.category %></td>
-                </tr>
-                
-                <%} );
-                
-               
-               %>
-
+                </tr>               
+                <%} ); %>
                 </tbody>
             </table>
-
             </div>
     </form>
-
-
 </div>
-
-

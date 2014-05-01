@@ -7,6 +7,13 @@
     <div class="page-header text-center">
 
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+        <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
+        
+            <a href="/destroy/<%= user.userId %>"  class="btn btn-primary">Delete Member</a>
+
+            <a href="/changeMembership/<%= user.userId %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
+
+            <a href="/issue/<%= user.userId %>" class="btn btn-primary">Issue Movie</a>
     </div>
 
 
@@ -79,14 +86,6 @@
 
                 </tbody>
             </table>
-            <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
-
-            <a href="/destroy/<%= user.userId %>"  class="btn btn-primary">Delete Member</a>
-
-            <a href="/changeMembership/<%= user.userId %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
-
-            <a href="/issue/<%= user.userId %>" class="btn btn-primary">Issue Movie</a>
-
             </div>
     </form>
 
