@@ -302,7 +302,7 @@ module.exports = function (app, passport) {
     //Search movie for members
     app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
     	//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
-    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam')  + ' like "%' + req.param('str')+'%"';
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
         connection.query(qry, function(err, movies, fields) {
             if (err) {
@@ -365,10 +365,12 @@ module.exports = function (app, passport) {
     //serch movies for admin 
     app.post('/searchMovie', isLoggedIn, function (req, res) {
     	//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
-    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+'';
+    	
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
+    	console.log(qry);
         connection.query(qry, function(err, movies, fields) {
-            if (err) {
+            if (err) {console.log('query unsuccessful');
             };
             console.log("in post");
             res.render('searchMovie.ejs', {
