@@ -7,7 +7,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : '',
+    password : 'pass',
     database : 'moviestore'
 });
 
@@ -65,6 +65,7 @@ module.exports = function (app, passport) {
                 }else{
                     expireDate.setDate(expireDate.getDate()+31);
                     availableCopy = 10;
+                    balance = 10;
                 }
 
                 connection.query('INSERT user ' +
@@ -97,6 +98,26 @@ module.exports = function (app, passport) {
 
     });
 
+    app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
+            if (err) {};
+            console.log('uid='+uid+'mid='+mid);
+            //res.render('viewMoviePage.ejs', {movies: movies[0]});
+        });
+
+    });
+    
+    app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+    	var userid=req.params.uid;
+    	var movieid=req.params.mid;
+        connection.query('SELECT * FROM movies', function(err, movies, fields) {
+            if (err) {};
+            console.log('uid='+req.params.uid+'mid='+req.params.mid);
+            //res.render('newPage.ejs', {movies: movies});
+        });
+
+    });
 
     //search members based on attributes
     app.post('/searchMember', isLoggedIn, function (req, res) {
@@ -120,17 +141,22 @@ module.exports = function (app, passport) {
         var memberDay = new Date();
         var availableCopy = 0;
         var userType;
+        var newBalance = 0;
         connection.query('SELECT * from user WHERE userId ="' + req.params.id +'"', function(err, rows, fields) {
             var checkedOutCopy = rows[0].checkedOutCopy;
+            var oldBalance = rows[0].balance;
             availableCopy = 0;
             if(req.params.type == "Simple"){
                 if (checkedOutCopy >= 10 ){
                     availableCopy = 0;
+
                 }else{
                     availableCopy = 10 - checkedOutCopy;
+
                 }
                 memberDay.setDate(memberDay.getDate()+31);
                 userType = "Premium";
+                newBalance = oldBalance + 10;
 
             }else{
                 if (checkedOutCopy >= 2 ){
@@ -140,9 +166,11 @@ module.exports = function (app, passport) {
                 }
                 memberDay.setDate(memberDay.getDate()+365);
                 userType = "Simple";
+                newBalance = oldBalance;
             }
             connection.query('UPDATE user SET userType = "' + userType
                 + '", availableCopy = ' + availableCopy
+                + ', balance = ' + newBalance
                 +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
                 + req.params.id +'"', function(err, rows, fields) {
 
@@ -201,20 +229,27 @@ module.exports = function (app, passport) {
         connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
             if (err) {};
             res.render('issueMovie.ejs', {
-                user: user[0]
+                user: user[0], searchres: ''
             });
 
         });
 
     });
-    
-    
-    
-    
-    
-    
-    
-    
+    app.post('/issueSearch/:id/:name', isLoggedIn, function (req, res) {
+    	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'" and AvailableCopies >= 1';
+    	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
+        connection.query(qry, function(err, movies, fields) {
+            if (err) {
+            };
+            var array = {id:req.params.id, firstName:req.params.name}
+            console.log(array);
+            res.render('issueMovie.ejs', {
+            	user: array, searchres: movies
+            });
+        });
+
+    });
+                    
     app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
 
         connection.query('UPDATE user SET firstName = "' + req.param('firstName')
@@ -352,7 +387,6 @@ module.exports = function (app, passport) {
             res.render('movie.ejs', {movies: movies, count: GLOBAL.count});
             });
         });
-
 
    
     app.post('/movieall', isLoggedIn, function (req, res) {

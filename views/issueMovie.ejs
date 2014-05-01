@@ -1,14 +1,67 @@
 <%- include adminheader %>
-
+<script>
+function val()
+{
+	 var btnId = $('input[name=Rad]:checked').attr('id');
+	 var s1="/issueMovie/"
+	 var s2=document.getElementById('c1').value;
+	 var s3="/"
+     //alert(btnId);
+	 //var s4=document.getElementById('c2').value;
+	 document.getElementById('myform').action=s1.concat(s2,s3,btnId);
+	 document.getElementById('myform').submit();       
+}
+</script>
 
 <div style="padding:30px">
 </div>
 <div class="container">
     <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> Issue Movie </h1>
-        
+        <h1><span class="fa fa-anchor"></span> Issue Movie </h1>        
         Welcome <%=user.firstName%>
-    </div>
+        <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
+    </div>	
 </div>
+<label> Search Attribute </label>
+<form class="form-inline" role="form" method="post" action="/issueSearch/<%=user.userId%>/<%=user.firstName%>">
+  <select class="form-control" id="searchparam" name="searchparam">
+                    <option value="id">id</option>
+                    <option value="MovieName">MovieName</option>
+                    <option value="MovieBanner">MovieBanner</option>
+                    <option value="ReleaseDate">ReleaseDate</option>
+                    <option value="RentAmt">RentAmt</option>
+                    <option value="AvlCopies">AvlCopies</option>
+                    <option value="category">category</option>
+  </select> &nbsp&nbsp&nbsp&nbsp
+  <div class="form-group">
+    <label class="sr-only">Search String</label>
+    <input type="text" class="form-control" placeholder="Enter Search String" id="str" name="str">
+  </div>
+  &nbsp&nbsp&nbsp&nbsp
+  <button type="submit" class="btn btn-primary">Search<i class="icon-search"></i></button>
+</form>
+<form action="" id="myform" name="myform">
+&nbsp&nbsp&nbsp&nbsp
+<button type="button" class="btn btn-primary" onclick="val()">Issue Movie<i class="icon-search"></i></button>
+<br>
+
+    <%
+    if (searchres!='')
+    {
+    	searchres.forEach( function ( searchres ){ %>
+
+    	<div class="panel panel-default">
+        	<div class="panel-heading">
+            	<a href="/viewMoviePage/<%= searchres.id %>"><h3 class="panel-title"> <%= searchres.MovieName %></h3> </a>
+            	<div>Id: <%= searchres.id %></div>
+            	<div class="radio">
+                <label>
+                <input type="radio" id="<%=searchres.id%>" value="<%=searchres.id%>" name="Rad"> Select movie
+                </label>
+                </div>
+            </div>        
+        </div>
+<% });} %>
+</form>
 
 
