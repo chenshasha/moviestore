@@ -2,11 +2,13 @@
 <script>
 function val()
 {
+	 var btnId = $('input[name=Rad]:checked').attr('id');
 	 var s1="/issueMovie/"
 	 var s2=document.getElementById('c1').value;
 	 var s3="/"
-	 var s4=document.getElementById('c2').value;
-	 document.getElementById('myform').action=s1.concat(s2,s3,s4);
+     //alert(btnId);
+	 //var s4=document.getElementById('c2').value;
+	 document.getElementById('myform').action=s1.concat(s2,s3,btnId);
 	 document.getElementById('myform').submit();       
 }
 </script>
@@ -52,9 +54,9 @@ function val()
         	<div class="panel-heading">
             	<a href="/viewMoviePage/<%= searchres.id %>"><h3 class="panel-title"> <%= searchres.MovieName %></h3> </a>
             	<div>Id: <%= searchres.id %></div>
-            	<div class="checkbox">
+            	<div class="radio">
                 <label>
-                <input type="checkbox" id="c2" value="<%=searchres.id%>" name="<%=searchres.id%>"> Select
+                <input type="radio" id="<%=searchres.id%>" value="<%=searchres.id%>" name="Rad"> Select movie
                 </label>
                 </div>
             </div>        
