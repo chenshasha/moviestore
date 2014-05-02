@@ -1,11 +1,10 @@
-/**
- * Created by shashachen on 4/30/14.
- */
 // app/routes.js
-
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
+var MicroCache	= require('microcache.js');
+var userCache = new MicroCache();
+var movieCache = new MicroCache();
 var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
@@ -14,7 +13,6 @@ var connection = mysql.createConnection({
     database : 'moviestore'
 });
 
-GLOBAL.count=0;
 
 module.exports = function (app, passport) {
     connection.connect();
@@ -68,6 +66,7 @@ module.exports = function (app, passport) {
                 }else{
                     expireDate.setDate(expireDate.getDate()+31);
                     availableCopy = 10;
+                    balance = 10;
                 }
 
                 connection.query('INSERT user ' +
@@ -76,11 +75,23 @@ module.exports = function (app, passport) {
                     phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
 
                 });
-                console.log(phone);
-                console.log('INSERT user ' +
+
+                var expireDate_string = expireDate.toISOString();
+                var expireDate_string = expireDate_string.replace("T"," ");
+                var expireDate_string = expireDate_string.substring(0, expireDate_string.length - 5);
+
+                var createDate_string = createDate.toISOString();
+                var createDate_string = createDate_string.replace("T"," ");
+                var createDate_string = createDate_string.substring(0, createDate_string.length - 5);
+
+
+                connection.query('INSERT user ' +
                     '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
                     userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
-                    phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")');
+                    phone + '","' + createDate_string +'","' + userType+ '","' + expireDate_string + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+
+                });
+
                 //save in mongodb
                 var newUser            = new User();
                 newUser.local.userId   = userId;
@@ -123,17 +134,22 @@ module.exports = function (app, passport) {
         var memberDay = new Date();
         var availableCopy = 0;
         var userType;
+        var newBalance = 0;
         connection.query('SELECT * from user WHERE userId ="' + req.params.id +'"', function(err, rows, fields) {
             var checkedOutCopy = rows[0].checkedOutCopy;
+            var oldBalance = rows[0].balance;
             availableCopy = 0;
             if(req.params.type == "Simple"){
                 if (checkedOutCopy >= 10 ){
                     availableCopy = 0;
+
                 }else{
                     availableCopy = 10 - checkedOutCopy;
+
                 }
                 memberDay.setDate(memberDay.getDate()+31);
                 userType = "Premium";
+                newBalance = oldBalance + 10;
 
             }else{
                 if (checkedOutCopy >= 2 ){
@@ -143,10 +159,23 @@ module.exports = function (app, passport) {
                 }
                 memberDay.setDate(memberDay.getDate()+365);
                 userType = "Simple";
+                newBalance = oldBalance;
             }
+
+            var memberDay_string = memberDay.toISOString();
+            var memberDay_string = memberDay_string.replace("T"," ");
+            var memberDay_string = memberDay_string.substring(0, memberDay_string.length - 5);
+
+            var today_string = today.toISOString();
+            var today_string = today_string.replace("T"," ");
+            var today_string = today_string.substring(0, today_string.length - 5);
+
+
+
             connection.query('UPDATE user SET userType = "' + userType
                 + '", availableCopy = ' + availableCopy
-                +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
+                + ', balance = ' + newBalance
+                +', createDate =" ' + today_string +'", expireDate = "'+ memberDay_string +'" WHERE userId = "'
                 + req.params.id +'"', function(err, rows, fields) {
 
             });
@@ -172,18 +201,6 @@ module.exports = function (app, passport) {
     });
 
 
-    //view individual profile
-    app.get('/profile/:id', isLoggedIn, function (req, res) {
-
-        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
-            if (err) {};
-            res.render('profile.ejs', {
-                user: user[0]
-            });
-
-        });
-
-    });
 
 
     //modify profile
@@ -243,22 +260,181 @@ module.exports = function (app, passport) {
     //search members
     app.get('/searchMember', function(req, res) {
 
-        connection.query('SELECT * from user', function(err, users, fields) {
+        var cachedUsers = userCache.getAll();
+        if (cachedUsers == null) {
+            console.log("cache miss, read user info from DB");
+            connection.query('SELECT * from user', function(err, users, fields) {
+                for (i=0; i < users.length; i++) {
+                    userCache.set(i, users[i])
+                }
 
-            res.render('searchMember.ejs', {
-                users: users
+                res.render('searchMember.ejs', {
+                    users: users
+                });
             });
+        } else {
+            console.log("cache hit, return user info from cache");
+            res.render('searchMember.ejs', {
+                users: cachedUsers
+            });
+        }
+
+    });
+//****************************************************************************************
+// Transaction Management
+//***************************************************************************************
+    app.post('/returnMovie/', isLoggedIn, function (req, res) {
+
+    });
+
+    app.get('/returnMovie/:uid', isLoggedIn, function (req, res) {
+        var array = {id:req.params.id, firstName:''}
+        connection.query('select * from user_movie um join movies m on um.movieId=m.id', function(err, rows, fields) {
+            if(err){console.log('unsuccessful select');}
+            res.render('returnMovie.ejs', {user: array, searchres: rows});
         });
 
 
     });
 
 
+    app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
+            if (err) {};
+            console.log('uid='+uid+'mid='+mid);
+            //res.render('viewMoviePage.ejs', {movies: movies[0]});
+        });
+
+    });
+
+    app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+        var userid=req.params.uid;
+        var movieid=req.params.mid;
+
+        connection.query('select availableCopy from user where userId="' +userid+ '"', function(err, rows, fields) {
+            if(rows[0].availableCopy > 0)
+            {
+                connection.query('insert into user_movie values("' +
+                    req.params.uid+ '",'+req.params.mid+',0)', function(err, rows, fields) {
+                    if(err){console.log('unsuccessful insert');}
+                });
+                console.log('Avail > 0 so rent 0');
+
+                connection.query('update user set checkedOutCopy=checkedOutCopy+1,availableCopy=availableCopy-1 where userId="'+req.params.uid+'"', function(err, rows, fields) {
+                    if(err){console.log('unsuccessful update');}
+                });
+                console.log('Avail > 0 so chk+1 and avl-1');
+
+                connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
+                    if(err){console.log('unsuccessful update on movies '+err);}
+                    console.log('Movies avail - 1');
+                });
+            }
+            else
+            {
+                var rent;
+                connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {
+                    connection.query('insert into user_movie values("' +
+                        req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+')', function(err, rows, fields) {
+                        if(err){console.log('unsuccessful insert');}
+                    });
+                    rent=rows[0].RentAmount;
+                    console.log('Avail < 0 so rent '+rows[0].RentAmount);
+                    connection.query('update user set checkedOutCopy=checkedOutCopy+1,balance=balance+'+rent+' where userId="'+req.params.uid+'"', function(err, rows, fields) {
+                        if(err){console.log('unsuccessful update'+err);}
+                        console.log('Avail < 0 so chk+1 and balance + '+rent);
+                    });
+                    connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
+                        if(err){console.log('unsuccessful update on movies '+err);}
+                        console.log('Movies avail - 1');
+                    });
+                    if(err){console.log('unsuccessful select');}
+                });
+
+            }
+
+        });
+
+        //check 1
+        /*connection.query('select date_format(from_unixtime(expireDate),"%Y%m%d") as ed, curdate() as cd from user where userId="'+userid+'"', function(err, rows, fields) {
+
+         var ed=rows[0].ed;
+         var cd=rows[0].cd;
+         console.log(ed.getDate() +''+ cd.getDate());
+         if(ed.getDate() > cd.getDate()){console.log('OK');}
+         });
+         //check 2
+         */
+
+        connection.query('update movies set userId= "' +
+            req.params.uid+ '"where id='+req.params.mid+'', function(err, rows, fields) {
+
+        });
+
+
+        console.log('insert user_movie values("' +
+            req.params.uid+ '",'+req.params.mid+')');
+        console.log('update movies set userId= "' +
+            req.params.uid+ '" where id='+req.params.mid+'');
+        // connection.query('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"', function(err, movies, fields) {
+        //if (err) {};
+        // console.log('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"');
+        //  console.log('uid='+req.params.uid+'mid='+req.params.mid);
+        var pathName = '/checkoutPage/'+ userid;
+        res.redirect(pathName);
+    });
+
+
+
+    app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM user join movies on movies.userId = user.userId where movies.userId="'+req.params.id+'"', function(err, joins, fields) {
+
+            if (err) {};
+            res.render('checkoutPage.ejs', {joins: joins});
+
+        });
+
+    });
+
+
+    app.get('/issue/:id', isLoggedIn, function (req, res) {
+        connection.query('update movies set userId= "' +
+            req.params.id+ '")', function(err, rows, fields) {
+
+        });
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+            if (err) {};
+            console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
+            res.render('issueMovie.ejs', {
+                user: user[0], searchres: ''
+            });
+
+        });
+
+    });
+    app.post('/issueSearch/:id/:name', isLoggedIn, function (req, res) {
+        var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'" and AvailableCopies >= 1';
+        if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%" and AvailableCopies > 0';}
+        connection.query(qry, function(err, movies, fields) {
+            if (err) {
+            };
+            var array = {id:req.params.id, firstName:req.params.name}
+            console.log(array);
+            res.render('issueMovie.ejs', {
+                user: array, searchres: movies
+            });
+        });
+
+    });
+    //********************************************************************************************
+
 //********************************************************************************************
 // Movie Management
 //********************************************************************************************
 
-    // create movie
+    // create movie 
     app.get('/createMovie', isLoggedIn, function (req, res) {
         res.render('createMovie.ejs'); // load the createMovie.ejs file
     });
@@ -305,10 +481,10 @@ module.exports = function (app, passport) {
     //Search movie for members
     app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
         //connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
-        var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+        var qry= 'SELECT * from movies WHERE ' + req.param('searchparam')  + ' like "%' + req.param('str')+'%"';
         if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
         connection.query(qry, function(err, movies, fields) {
-            if (err) {
+            if (err) { res.redirect('/searchMovieForMembers')
             };
             console.log("in post");
             res.render('searchMovieForMembers.ejs', {
@@ -347,15 +523,40 @@ module.exports = function (app, passport) {
     //***************************************************************
 
     //view all movies
-    app.get('/movieall', function(req, res) {
+    app.get('/movieall/:cnt',isLoggedIn, function(req, res) {
 
-        connection.query('SELECT * from movies', function(err, movies, fields) {
+        var cachedMovies = movieCache.getAll();
+        if (cachedMovies == null) {
+            console.log("cache miss, read movie info from DB");
+            var low=0;
+            low=(req.params.cnt * 20) - 20;
 
-            GLOBAL.count=GLOBAL.count+1;
-            res.render('movie.ejs', {movies: movies, count: GLOBAL.count});
-        });
+            connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
+                console.log('low='+low);
+                //GLOBAL.count=GLOBAL.count+1;
+                for (i=0; i < movies.length; i++) {
+                    movieCache.set(i, movies[i])
+                }
+                res.render('movie.ejs', {
+                    movies: movies ,cnt: req.params.cnt
+                });
+            });
+        } else {
+            console.log("cache hit, return movie info from cache");
+            res.render('movie.ejs', {
+                movies: cachedMovies, cnt: req.params.cnt
+            });
+        }
+
+//        var low=0;
+//        low=(req.params.cnt * 20) - 20;
+//        connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
+//            console.log('low='+low);
+//            //GLOBAL.count=GLOBAL.count+1;
+//            res.render('movie.ejs', {movies: movies ,cnt: req.params.cnt});
+//        });
+
     });
-
 
 
     app.post('/movieall', isLoggedIn, function (req, res) {
@@ -365,23 +566,40 @@ module.exports = function (app, passport) {
 
 //*******************************************
 
-    //serch movies for admin
+    //serch movies for admin 
     app.post('/searchMovie', isLoggedIn, function (req, res) {
         //connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
-        var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"';
+        var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+'';
+
         if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
+        //console.log(qry);
         connection.query(qry, function(err, movies, fields) {
             if (err) {
+                res.redirect('/searchMovie');
+                console.log('query unsuccessful');
             };
-            console.log("in post");
-            res.render('searchMovie.ejs', {
-                movies: movies
-            });
+            if(movies.length === 0){
+                // console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
+                console.log('no id');
+                //flash the message
+                req.flash("No such Id', 'That id does not exist");
+
+                res.render('searchMovie.ejs', { message: req.flash('noid') });
+
+            }else{
+
+                console.log("in post");
+                res.render('searchMovie.ejs', {
+                    movies: movies
+                });
+            };
         });
+
 
     });
     app.get('/searchMovie', function(req, res) {
         console.log("in get");
+
         connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 
             res.render('searchMovie.ejs', {
@@ -394,7 +612,7 @@ module.exports = function (app, passport) {
 
 
 
-    //view individual movie
+    //view individual movie 
     app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
 
         connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
@@ -439,7 +657,7 @@ module.exports = function (app, passport) {
     });
 
 
-//***************************************************************
+//***************************************************************    
 
 
 
@@ -505,7 +723,6 @@ module.exports = function (app, passport) {
     // =====================================
     app.get('/logout', function (req, res) {
         req.logout();
-
         res.redirect('/');
 
     });

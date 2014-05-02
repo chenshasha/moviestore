@@ -45,8 +45,11 @@ var configDB = require('./config/database.js');
 mongoose.connect(configDB.url); // connect to our database
 var db = mongoose.connection;
 
-//use mysql
+////use mysql
 require('./app/routes-mysql.js')(app, passport);
+
+//use caching
+//require('./app/routes-caching.js')(app, passport);
 
 
 // launch ======================================================================
