@@ -3,6 +3,7 @@
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
+GLOBAL.count=0;
 
 module.exports = function (app, passport) {
 

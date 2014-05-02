@@ -1,4 +1,5 @@
 // app/routes.js
+
 var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
@@ -10,6 +11,7 @@ var connection = mysql.createConnection({
     database : 'moviestore'
 });
 
+GLOBAL.count=0;
 
 module.exports = function (app, passport) {
     connection.connect();
@@ -66,17 +68,22 @@ module.exports = function (app, passport) {
                     balance = 10;
                 }
 
+                var expireDate_string = expireDate.toISOString();
+                var expireDate_string = expireDate_string.replace("T"," ");
+                var expireDate_string = expireDate_string.substring(0, expireDate_string.length - 5);
+
+                var createDate_string = createDate.toISOString();
+                var createDate_string = createDate_string.replace("T"," ");
+                var createDate_string = createDate_string.substring(0, createDate_string.length - 5);
+
+
                 connection.query('INSERT user ' +
                     '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
                     userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
-                    phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+                    phone + '","' + createDate_string +'","' + userType+ '","' + expireDate_string + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
 
                 });
-                console.log(phone);
-                console.log('INSERT user ' +
-                    '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
-                    userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
-                    phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")');
+
                 //save in mongodb
                 var newUser            = new User();
                 newUser.local.userId   = userId;
@@ -96,7 +103,7 @@ module.exports = function (app, passport) {
 
     });
 
- 
+
     //search members based on attributes
     app.post('/searchMember', isLoggedIn, function (req, res) {
 
@@ -146,10 +153,21 @@ module.exports = function (app, passport) {
                 userType = "Simple";
                 newBalance = oldBalance;
             }
+
+            var memberDay_string = memberDay.toISOString();
+            var memberDay_string = memberDay_string.replace("T"," ");
+            var memberDay_string = memberDay_string.substring(0, memberDay_string.length - 5);
+
+            var today_string = today.toISOString();
+            var today_string = today_string.replace("T"," ");
+            var today_string = today_string.substring(0, today_string.length - 5);
+
+
+
             connection.query('UPDATE user SET userType = "' + userType
                 + '", availableCopy = ' + availableCopy
                 + ', balance = ' + newBalance
-                +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
+                +', createDate =" ' + today_string +'", expireDate = "'+ memberDay_string +'" WHERE userId = "'
                 + req.params.id +'"', function(err, rows, fields) {
 
             });
@@ -202,7 +220,20 @@ module.exports = function (app, passport) {
 
     });
 
-                    
+    app.get('/issue/:id', isLoggedIn, function (req, res) {
+
+        connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+            if (err) {};
+            res.render('issueMovie.ejs', {
+                user: user[0]
+            });
+
+        });
+
+    });
+    
+
+    
     app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
 
         connection.query('UPDATE user SET firstName = "' + req.param('firstName')
@@ -237,6 +268,8 @@ module.exports = function (app, passport) {
 
 
     });
+<<<<<<< HEAD
+
 //****************************************************************************************
 // Transaction Management
 //***************************************************************************************
@@ -256,7 +289,10 @@ module.exports = function (app, passport) {
 
     
        app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+=======
+>>>>>>> branch 'master' of https://github.com/shasha-chen/moviestore.git
 
+<<<<<<< HEAD
            connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
                if (err) {};
                console.log('uid='+uid+'mid='+mid);
@@ -386,6 +422,8 @@ module.exports = function (app, passport) {
 
        });
    //********************************************************************************************
+=======
+>>>>>>> branch 'master' of https://github.com/shasha-chen/moviestore.git
 
 //********************************************************************************************
 // Movie Management
@@ -441,7 +479,7 @@ module.exports = function (app, passport) {
     	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam')  + ' like "%' + req.param('str')+'%"';
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
         connection.query(qry, function(err, movies, fields) {
-            if (err) { res.redirect('/searchMovieForMembers')
+            if (err) {
             };
             console.log("in post");
             res.render('searchMovieForMembers.ejs', {
@@ -480,15 +518,15 @@ module.exports = function (app, passport) {
     //***************************************************************
 
     //view all movies
-    app.get('/movieall/:cnt',isLoggedIn, function(req, res) {
-    	var low=0;
-    	low=(req.params.cnt * 20) - 20;
-        connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
-        console.log('low='+low);
-        	//GLOBAL.count=GLOBAL.count+1;
-            res.render('movie.ejs', {movies: movies ,cnt: req.params.cnt});
+    app.get('/movieall', function(req, res) {
+
+        connection.query('SELECT * from movies', function(err, movies, fields) {
+
+        	GLOBAL.count=GLOBAL.count+1;
+            res.render('movie.ejs', {movies: movies, count: GLOBAL.count});
             });
         });
+
 
    
     app.post('/movieall', isLoggedIn, function (req, res) {
@@ -504,34 +542,19 @@ module.exports = function (app, passport) {
     	var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+'';
     	
     	if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%"';}
-    	//console.log(qry);
+    	console.log(qry);
         connection.query(qry, function(err, movies, fields) {
-            if (err) { 
-            	 res.redirect('/searchMovie');
-            	 console.log('query unsuccessful');
+            if (err) {console.log('query unsuccessful');
             };
-            if(movies.length === 0){
-               // console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
-                console.log('no id');
-                //flash the message
-            	req.flash("No such Id', 'That id does not exist");
-
-                res.render('searchMovie.ejs', { message: req.flash('noid') });
-
-            }else{
-            
             console.log("in post");
             res.render('searchMovie.ejs', {
                 movies: movies
             });
-            };
         });
-       
 
     });
     app.get('/searchMovie', function(req, res) {
     	console.log("in get");
-    	
         connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 
             res.render('searchMovie.ejs', {
@@ -655,6 +678,7 @@ module.exports = function (app, passport) {
     // =====================================
     app.get('/logout', function (req, res) {
         req.logout();
+
         res.redirect('/');
 
     });

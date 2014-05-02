@@ -98,11 +98,22 @@ module.exports = function(passport) {
                         balance = 10;
                     }
 
+
+                    var expireDate_string = expireDate.toISOString();
+                    var expireDate_string = expireDate_string.replace("T"," ");
+                    var expireDate_string = expireDate_string.substring(0, expireDate_string.length - 5);
+
+                    var createDate_string = createDate.toISOString();
+                    var createDate_string = createDate_string.replace("T"," ");
+                    var createDate_string = createDate_string.substring(0, createDate_string.length - 5);
+
+
+
                     connection.query('INSERT user ' +
                         '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance,' +
                         'checkedOutCopy, availableCopy, address) VALUES ("'+
                         userId+ '","' + email + '","' + city + '","' +state + '","' +zipcode + '","' + firstName + '","' + lastName
-                        + '","' + phone + '","' + createDate + '","' + userType + '","' + expireDate + '",' + balance + ',' +checkedOutCopy + ',' + availableCopy + ',"' + address +'")', function(err, rows, fields) {
+                        + '","' + phone + '","' + createDate_string + '","' + userType + '","' + expireDate_string + '",' + balance + ',' +checkedOutCopy + ',' + availableCopy + ',"' + address +'")', function(err, rows, fields) {
                         if(err){
 
                         }

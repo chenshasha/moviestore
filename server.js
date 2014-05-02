@@ -48,6 +48,9 @@ var db = mongoose.connection;
 //use mysql
 require('./app/routes-mysql.js')(app, passport);
 
+//use caching
+//require('./app/routes-caching.js')(app, passport);
+
 
 // launch ======================================================================
 app.listen(port);
