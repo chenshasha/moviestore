@@ -6,7 +6,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
-    password : 'pass',
+    password : '',
     database : 'moviestore'
 });
 
@@ -72,11 +72,23 @@ module.exports = function (app, passport) {
                     phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
 
                 });
-                console.log(phone);
-                console.log('INSERT user ' +
+
+                var expireDate_string = expireDate.toISOString();
+                var expireDate_string = expireDate_string.replace("T"," ");
+                var expireDate_string = expireDate_string.substring(0, expireDate_string.length - 5);
+
+                var createDate_string = createDate.toISOString();
+                var createDate_string = createDate_string.replace("T"," ");
+                var createDate_string = createDate_string.substring(0, createDate_string.length - 5);
+
+
+                connection.query('INSERT user ' +
                     '(userId, email, city, state, zipcode, firstName, lastName, phone, createDate, userType, expireDate, balance, checkedOutCopy, availableCopy, address) VALUES ("'+
                     userId + '","' + email +'","'+ city+ '","' + state +'","' + zipcode+ '","'+ firstName+ '","'+ lastName +'","'+
-                    phone + '","' + createDate +'","' + userType+ '","' + expireDate + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")');
+                    phone + '","' + createDate_string +'","' + userType+ '","' + expireDate_string + '",' + balance +',' +checkedOutCopy + ','+availableCopy+',"'+ address+'")', function(err, rows, fields) {
+
+                });
+
                 //save in mongodb
                 var newUser            = new User();
                 newUser.local.userId   = userId;
@@ -146,10 +158,21 @@ module.exports = function (app, passport) {
                 userType = "Simple";
                 newBalance = oldBalance;
             }
+
+            var memberDay_string = memberDay.toISOString();
+            var memberDay_string = memberDay_string.replace("T"," ");
+            var memberDay_string = memberDay_string.substring(0, memberDay_string.length - 5);
+
+            var today_string = today.toISOString();
+            var today_string = today_string.replace("T"," ");
+            var today_string = today_string.substring(0, today_string.length - 5);
+
+
+
             connection.query('UPDATE user SET userType = "' + userType
                 + '", availableCopy = ' + availableCopy
                 + ', balance = ' + newBalance
-                +', createDate =" ' + today +'", expireDate = "'+ memberDay +'" WHERE userId = "'
+                +', createDate =" ' + today_string +'", expireDate = "'+ memberDay_string +'" WHERE userId = "'
                 + req.params.id +'"', function(err, rows, fields) {
 
             });
