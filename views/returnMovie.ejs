@@ -1,0 +1,47 @@
+<%- include adminheader %>
+<script>
+function val()
+{
+	 var btnId = $('input[name=Rad]:checked').attr('id');
+	 var s1="/issueMovie/"
+	 var s2=document.getElementById('c1').value;
+	 var s3="/"
+     //alert(btnId);
+	 //var s4=document.getElementById('c2').value;
+	 document.getElementById('myform').action=s1.concat(s2,s3,btnId);
+	 document.getElementById('myform').submit();       
+}
+</script>
+
+<div style="padding:30px">
+</div>
+<div class="container">
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Return Movie </h1>        
+        Welcome <%=user.firstName%>
+        <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
+    </div>	
+</div>
+<button type="button" class="btn btn-primary" onclick="val()">Return Movie<i class="icon-search"></i></button>
+<br>
+
+    <%
+    if (searchres!='')
+    {
+    	searchres.forEach( function ( searchres ){ %>
+
+    	<div class="panel panel-default">
+        	<div class="panel-heading">
+            	<a href="/viewMoviePage/<%= searchres.id %>"><h3 class="panel-title"> <%= searchres.MovieName %></h3> </a>
+            	<div>Id: <%= searchres.id %></div>
+            	<div class="radio">
+                <label>
+                <input type="radio" id="<%=searchres.id%>" value="<%=searchres.id%>" name="Rad"> Select movie
+                </label>
+                </div>
+            </div>        
+        </div>
+<% });} %>
+</form>
+
+
