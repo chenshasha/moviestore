@@ -278,7 +278,11 @@ module.exports = function (app, passport) {
        	connection.query('update movies set userId=NULL where id='+movieid, function(err, rows, fields) {	
         if(err){console.log('unsuccessful update on movies'+err);}
         console.log('userid set null');
-        });	
+        });
+       	connection.query('update user_movie set returnDate=date_format(curdate(),"%Y-%m-%d") where userId="'+userid+'" and movieId='+movieid, function(err, rows, fields) {	
+        if(err){console.log('unsuccessful update on user_movie'+err);}
+        console.log('userid set null');
+        });
        	connection.query('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"', function(err, joins, fields) {
        	//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
         if (err) {console.log('unsuccessful select on join '+err);}
@@ -289,7 +293,7 @@ module.exports = function (app, passport) {
     
     app.get('/returnMovie/:uid/:name', isLoggedIn, function (req, res) {
     	var array = {id:req.params.uid, firstName:req.params.name};
-    			connection.query('select * from user_movie um join movies m on um.movieId=m.id', function(err, rows, fields) {
+    			connection.query('select * from user_movie um join movies m on um.movieId=m.id where returnDate is NULL', function(err, rows, fields) {
 	       			if(err){console.log('unsuccessful select');}
 	       			res.render('returnMovie.ejs', {user: array, searchres: rows});
 	            });
@@ -333,7 +337,7 @@ module.exports = function (app, passport) {
        			var rent;
    				connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {       							
    							connection.query('insert into user_movie values("' +
-   	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+')', function(err, rows, fields) {
+   	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL)', function(err, rows, fields) {
    	       	       			if(err){console.log('unsuccessful insert');}
    							});	
    							rent=rows[0].RentAmount;
@@ -392,10 +396,10 @@ module.exports = function (app, passport) {
                });
        	
        	
-       	console.log('insert user_movie values("' +
-                req.params.uid+ '",'+req.params.mid+')');
-       	console.log('update movies set userId= "' +
-                   req.params.uid+ '" where id='+req.params.mid+'');
+       	//console.log('insert user_movie values("' +
+          //      req.params.uid+ '",'+req.params.mid+')');
+       	//console.log('update movies set userId= "' +
+          //         req.params.uid+ '" where id='+req.params.mid+'');
           // connection.query('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"', function(err, movies, fields) {
                //if (err) {};
               // console.log('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"');
