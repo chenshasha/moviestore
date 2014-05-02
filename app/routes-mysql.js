@@ -271,29 +271,38 @@ module.exports = function (app, passport) {
 	    if(err){console.log('unsuccessful update on movies '+err);}
 	    console.log('Movies avail + 1');
 	    });
+    	connection.query('select availableCopy userType from user where userId="' +userid+ '"', function(err, rows, fields) {
+       		if(rows[0].availableCopy <2 && rows[0].userType=="simple" || rows[0].availableCopy <10 && rows[0].userType=="premium")
+       			{
        	connection.query('update user set availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
     	if(err){console.log('unsuccessful update on user '+err);}
         console.log('user avail + 1');
     	});	
-       	//connection.query('update movies set userId=NULL where id='+movieid, function(err, rows, fields) {	
-        //if(err){console.log('unsuccessful update on movies'+err);}
-       // console.log('userid set null');
-       // });
+       			}
+       		else{console.log('cannot add more copies');};
+    	});
+       	connection.query('update movies set userId=NULL where id='+movieid, function(err, rows, fields) {	
+        if(err){console.log('unsuccessful update on movies'+err);}
+        console.log('userid set null');
+       });
        	connection.query('update user_movie set returnDate=date_format(curdate(),"%Y-%m-%d") where userId="'+userid+'" and movieId='+movieid, function(err, rows, fields) {	
         if(err){console.log('unsuccessful update on user_movie'+err);}
         console.log('userid set null');
         });
-       	connection.query('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"', function(err, joins, fields) {
+       	connection.query('SELECT * FROM user_movie join movies on movies.id = user_movie.movieId join user on user_movie.userId=user.userId where user_movie.userId="'+userid+'" and user_movie.returnDate is not null', function(err, joins, fields) {
        	//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
         if (err) {console.log('unsuccessful select on join '+err);}
-        res.render('returnContinue.ejs', {joins: joins});     
+        if(joins.length!=0){
+        res.render('returnContinue.ejs', {joins: joins});   
+        }
+        else{console.log('no movie to return');}
       });
        	//res.redirect('/checkoutPage/'+userid)
     });
     
     app.get('/returnMovie/:uid/:name', isLoggedIn, function (req, res) {
     	var array = {id:req.params.uid, firstName:req.params.name};
-    			connection.query('select * from user_movie um join movies m on um.movieId=m.id where returnDate is NULL', function(err, rows, fields) {
+    			connection.query('select * from user_movie um join movies m on um.movieId=m.id where returnDate is  NULL', function(err, rows, fields) {
 	       			if(err){console.log('unsuccessful select');}
 	       			res.render('returnMovie.ejs', {user: array, searchres: rows});
 	            });
@@ -317,6 +326,30 @@ module.exports = function (app, passport) {
            });
           
 });
+       
+       
+       
+
+       app.post('/pay/:uid', isLoggedIn, function (req, res) {
+    		
+           connection.query('update user_movie set checkedOut=true where userId="'+req.params+'"', function(err, movies, fields) {
+               if (err) {};
+               console.log('uid='+uid+'mid='+mid);
+          
+               //res.render('viewMoviePage.ejs', {movies: movies[0]});
+          
+           
+           		
+    		 
+           	 
+           });
+          
+});
+       
+       
+       
+       
+       
       
        
        app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
@@ -332,7 +365,7 @@ module.exports = function (app, passport) {
    				connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
    					var date= new Date();
    							connection.query('insert into user_movie values("' +
-   	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,date_format(curdate(),"%Y-%m-%d"))', function(err, rows, fields) {
+   	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,date_format(curdate(),"%Y-%m-%d"),NULL)', function(err, rows, fields) {
    	       	       			if(err){console.log('unsuccessful insert');}
    							});	
    							rent=rows[0].RentAmount;
