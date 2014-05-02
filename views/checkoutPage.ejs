@@ -1,0 +1,141 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+
+<div class="container">
+
+    <div class="page-header text-center">
+
+        <h6><span class="fa fa-anchor"></span>User Information</h6>
+    </div>
+
+
+    <form >
+        <div class="col-md-6 col-md-offset-3">
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+                <tr>
+                    <th style="width: 150px;">Member ID: </th>
+                    <td><%= joins[0].userId %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Email: </th>
+                    <td><%= joins[0].email %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Name: </th>
+                    <td><%=joins[0].firstName %> <%= joins[0].lastName %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Phone Number: </th>
+                    <td><%= joins[0].phone %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Address: </th>
+                    <td><%= joins[0].address %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">City: </th>
+                    <td><%= joins[0].city %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">State: </th>
+                    <td><%= joins[0].state %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Zip Code: </th>
+                    <td><%= joins[0].zipcode %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership: </th>
+                    <td><%= joins[0].userType %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership Start Date: </th>
+                    <td><%= joins[0].createDate %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Membership Expire Date: </th>
+                    <td><%= joins[0].expireDate %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Checkout Copy: </th>
+                    <td><%= joins[0].checkedOutCopy %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Available Copy: </th>
+                    <td><%= joins[0].availableCopy %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Balance: </th>
+                    <td><%= joins[0].balance %></td>
+                </tr>
+
+                </tbody>
+            </table>
+            
+            <div class="page-header text-center">
+
+        <h4><span class="fa fa-anchor"></span> Movie Information</h4>
+    </div>
+            
+            
+             <form >
+        <div class="col-md-6 col-md-offset-3">
+         <% joins.forEach( function ( joins ){ %>
+            <table class="table table-bordered table-hover">
+                <tbody style="text-align:left;">
+                
+                <tr>
+                    <th style="width: 150px;">MovieID: </th>
+                    <td><%=joins.id%><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Movie Name: </th>
+                    <td><%=joins.MovieName%><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Movie Banner: </th>
+                    <td><%= joins.MovieBanner %></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Release Date: </th>
+                    <td><%= joins.ReleaseDate %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Rent Amount: </th>
+                    <td><%= joins.RentAmount %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Available Copies: </th>
+                    <td><%= joins.AvailableCopies %></td>
+                </tr>
+
+                <tr>
+                    <th style="width: 150px;">Category: </th>
+                    <td><%= joins.category %></td>
+                </tr>
+
+               
+
+                </tbody>
+            </table>
+           <% }); %>
+            <a href="/issue/<%= joins[0].userId %>" class="btn btn-primary">Continue  </a>
+            <a href="#" class="btn btn-primary">Checkout </a>
+            
+
+            </div>
+    </form>
+
+
+</div>
+
+
