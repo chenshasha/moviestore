@@ -1,0 +1,157 @@
+<%- include adminheader %>
+<div style="padding:30px">
+</div>
+<div style=" width:500px;">
+<div  style="float:left; width:250px;">
+
+
+    
+
+        <h6><span class="fa fa-anchor"></span>User Information</h6>
+   
+
+
+    <form >
+        
+                <tbody align="left">
+                <tr>
+                    <th style="width: 150px;">Member ID: </th>
+                    <td><%= joins[0].userId %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Email: </th>
+                    <td><%= joins[0].email %><br></td>
+                </tr>
+                <tr>
+                    <th style="width: 150px;">Name: </th>
+                    <td><%=joins[0].firstName %> <%= joins[0].lastName %></td>
+                </tr>
+             
+                 <tr>
+                    <th style="width: 150px;">Name: </th>
+                    <td><%=joins[0].balance %> </td>
+                </tr>   
+            
+
+        <h4><span class="fa fa-anchor"></span> Movies Issued</h4>
+    
+            
+       
+            
+         <% var sum=0; joins.forEach( function ( joins ){ %>
+            <table align="center">
+                
+               
+                <tr>
+                   
+                    <td><%=joins.MovieName%><br></td>
+                </tr>
+               <% sum=sum+joins.rent %>
+                </tbody>
+            </table>
+           <% }); %>
+           
+          
+           <h4> Total Rent is <%=sum%> </h4> 
+            
+            
+            
+
+            
+    </form>
+
+</div>
+
+<div style="float:right; width:250px;">
+
+
+  <div class="container">
+
+  <div class="span12">
+      <form class="form-horizontal span6">
+        <fieldset>
+          <legend>Credit Card Payment</legend>
+       
+          <div class="control-group">
+            <label class="control-label">Card Holder's Name</label>
+            <div class="controls">
+              <input type="text" class="input-block-level" pattern="\w+ \w+.*" title="First and last name" required="">
+            </div>
+          </div>
+       
+          <div class="control-group">
+            <label class="control-label">Card Number</label>
+            <div class="controls">
+              <div class="row-fluid">
+                <div class="span3">
+                  <input type="text" class="input-block-level" autocomplete="off" maxlength="4" pattern="\d{4}" title="First 4 digits" required="">
+               
+                  <input type="text" class="input-block-level" autocomplete="off" maxlength="4" pattern="\d{4}" title="Second 4 digits" required="">
+               
+                  <input type="text" class="input-block-level" autocomplete="off" maxlength="4" pattern="\d{4}" title="Third 4 digits" required="">
+               
+                  <input type="text" class="input-block-level" autocomplete="off" maxlength="4" pattern="\d{4}" title="Fourth 4 digits" required="">
+                </div>
+              </div>
+            </div>
+          </div>
+       
+          <div class="control-group">
+            <label class="control-label">Card Expiry Date</label>
+            <div class="controls">
+              <div class="row-fluid">
+                <div class="span9">
+                  <select class="input-block-level" name="cc_exp_mo">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                  </select>
+                </div>
+                <div class="span3">
+                  <select class="input-block-level" name="cc_exp_yr">
+                    <option>2014</option>
+                    <option>2015</option>
+                    <option>2016</option>
+                    <option>2017</option>
+                    <option>2018</option>
+                    <option>2019</option>
+                    <option>2020</option>
+                    <option>2021</option>
+                    <option>2022</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+       
+          <div class="control-group">
+            <label class="control-label">Card CVV</label>
+            <div class="controls">
+              <div class="row-fluid">
+                <div class="span3">
+                  <input type="text" class="input-block-level" autocomplete="off" maxlength="3" pattern="\d{3}" title="Three digits on back of card" required="">
+                </div>
+                <div class="span8">                 
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Pay</button>
+            <button type="button" class="btn">Cancel</button>
+          </div>
+        </fieldset>
+      </form>
+   
+
+</div>
+</div>

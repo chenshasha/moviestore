@@ -263,13 +263,37 @@ module.exports = function (app, passport) {
 //****************************************************************************************
 // Transaction Management
 //***************************************************************************************
-    app.post('/returnMovie/', isLoggedIn, function (req, res) {
-    	
+    app.post('/returnMovie/:uid/:mid', isLoggedIn, function (req, res) {
+    	var userid=req.params.uid;
+       	var movieid=req.params.mid;
+       	console.log(userid);
+       	connection.query('update movies set AvailableCopies=AvailableCopies+1 where id='+movieid, function(err, rows, fields) {
+	    if(err){console.log('unsuccessful update on movies '+err);}
+	    console.log('Movies avail + 1');
+	    });
+       	connection.query('update user set availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
+    	if(err){console.log('unsuccessful update on user '+err);}
+        console.log('user avail + 1');
+    	});	
+       	//connection.query('update movies set userId=NULL where id='+movieid, function(err, rows, fields) {	
+        //if(err){console.log('unsuccessful update on movies'+err);}
+       // console.log('userid set null');
+       // });
+       	connection.query('update user_movie set returnDate=date_format(curdate(),"%Y-%m-%d") where userId="'+userid+'" and movieId='+movieid, function(err, rows, fields) {	
+        if(err){console.log('unsuccessful update on user_movie'+err);}
+        console.log('userid set null');
+        });
+       	connection.query('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"', function(err, joins, fields) {
+       	//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
+        if (err) {console.log('unsuccessful select on join '+err);}
+        res.render('returnContinue.ejs', {joins: joins});     
+      });
+       	//res.redirect('/checkoutPage/'+userid)
     });
     
-    app.get('/returnMovie/:uid', isLoggedIn, function (req, res) {
-    	var array = {id:req.params.id, firstName:''}
-    			connection.query('select * from user_movie um join movies m on um.movieId=m.id', function(err, rows, fields) {
+    app.get('/returnMovie/:uid/:name', isLoggedIn, function (req, res) {
+    	var array = {id:req.params.uid, firstName:req.params.name};
+    			connection.query('select * from user_movie um join movies m on um.movieId=m.id where returnDate is NULL', function(err, rows, fields) {
 	       			if(err){console.log('unsuccessful select');}
 	       			res.render('returnMovie.ejs', {user: array, searchres: rows});
 	            });
@@ -279,14 +303,21 @@ module.exports = function (app, passport) {
 
     
        app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
-
+    		
            connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
                if (err) {};
                console.log('uid='+uid+'mid='+mid);
+          
                //res.render('viewMoviePage.ejs', {movies: movies[0]});
+          
+           
+           		
+    		 
+           	 
            });
-
-       });
+          
+});
+      
        
        app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
        	var userid=req.params.uid;
@@ -295,25 +326,32 @@ module.exports = function (app, passport) {
        	connection.query('select availableCopy from user where userId="' +userid+ '"', function(err, rows, fields) {
        		if(rows[0].availableCopy > 0)
        			{
-       				connection.query('insert into user_movie values("' +
-       	                req.params.uid+ '",'+req.params.mid+',0)', function(err, rows, fields) {
-       	       			if(err){console.log('unsuccessful insert');}
-       	            });
-       				console.log('Avail > 0 so rent 0');
        				
-       				connection.query('update user set checkedOutCopy=checkedOutCopy+1,availableCopy=availableCopy-1 where userId="'+req.params.uid+'"', function(err, rows, fields) {
-           	       			if(err){console.log('unsuccessful update');}
-           	            });
-       				console.log('Avail > 0 so chk+1 and avl-1');
-       				
-       				connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
-	       	       	if(err){console.log('unsuccessful update on movies '+err);}
-	       	        console.log('Movies avail - 1');
-	       	       	});	
+       			var rent;
+       			connection.query('update movies set userId="'+req.params.uid+'" where id='+req.params.mid+'',function(err,result){if(err){console.log('error in updating userid in movies');}});
+   				connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
+   					var date= new Date();
+   							connection.query('insert into user_movie values("' +
+   	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,date_format(curdate(),"%Y-%m-%d"))', function(err, rows, fields) {
+   	       	       			if(err){console.log('unsuccessful insert');}
+   							});	
+   							rent=rows[0].RentAmount;
+   							console.log('Avail < 0 so rent '+rows[0].RentAmount);		
+   							connection.query('update user set checkedOutCopy=checkedOutCopy+1, availableCopy=availableCopy-1,balance=balance+'+rent+' where userId="'+req.params.uid+'"', function(err, rows, fields) {
+   	       	       	       	if(err){console.log('unsuccessful update'+err);}
+   	       	       	       	console.log('Avail < 0 so chk+1 and balance + '+rent);
+   	       	       	        });	
+   							connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
+   				       	    if(err){console.log('unsuccessful update on movies '+err);}
+   				       	    console.log('Movies avail - 1');
+   				       	    });	
+   				if(err){console.log('unsuccessful select');}
+   	         	});
        			}
        		else
        			{
-       				var rent;
+       				console.log("Cannot Rent - Overlimit");
+       				/*var rent;
        				connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {       							
        							connection.query('insert into user_movie values("' +
        	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+')', function(err, rows, fields) {
@@ -331,7 +369,7 @@ module.exports = function (app, passport) {
        				       	    });	
        				if(err){console.log('unsuccessful select');}
        	         	});
-       				
+       				*/
        			}
 
             });
@@ -347,16 +385,13 @@ module.exports = function (app, passport) {
        	//check 2
        	*/
        	
-       	connection.query('update movies set userId= "' +
-                   req.params.uid+ '"where id='+req.params.mid+'', function(err, rows, fields) {
-
-               });
+      
        	
        	
-       	console.log('insert user_movie values("' +
-                req.params.uid+ '",'+req.params.mid+')');
-       	console.log('update movies set userId= "' +
-                   req.params.uid+ '" where id='+req.params.mid+'');
+       	//console.log('insert user_movie values("' +
+          //      req.params.uid+ '",'+req.params.mid+')');
+       	//console.log('update movies set userId= "' +
+          //         req.params.uid+ '" where id='+req.params.mid+'');
           // connection.query('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"', function(err, movies, fields) {
                //if (err) {};
               // console.log('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"');
@@ -369,21 +404,32 @@ module.exports = function (app, passport) {
        
        app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-           connection.query('SELECT * FROM user join movies on movies.userId = user.userId where movies.userId="'+req.params.id+'"', function(err, joins, fields) {
+           connection.query('SELECT * FROM user_movie join movies on movies.userId = user_movie.userId join user on user_movie.userId=user.userId where user_movie.userId="'+req.params.id+'" and returnDate is NULL', function(err, joins, fields) {
               
                	 if (err) {};
+               	 if(joins.length!=0){
                res.render('checkoutPage.ejs', {joins: joins});
+               	 }
+               	 else{console.log('no movies in the cart');  
+               	// res.render('profile.ejs');}
+               	 }
+           });
+
+       });
+       
+       app.get('/checkout/:id', isLoggedIn, function (req, res) {
+
+           connection.query(' select * from user_movie join user on user_movie.userId=user.userId join movies on user_movie.movieId=movies.id  where user_movie.userId="'+req.params.id+'" and user_movie.returnDate is NULL',function(err,joins){
+               	 if (err) {};
+               res.render('generateBill.ejs', {joins: joins});
           
            });
 
        });
        
-
        app.get('/issue/:id', isLoggedIn, function (req, res) {
-       	connection.query('update movies set userId= "' +
-                   req.params.id+ '")', function(err, rows, fields) {
-
-               });
+    	   
+    	 
            connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
                if (err) {};
                console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');

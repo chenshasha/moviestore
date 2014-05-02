@@ -3,10 +3,10 @@
 function val()
 {
 	 var btnId = $('input[name=Rad]:checked').attr('id');
-	 var s1="/issueMovie/"
+	 var s1="/returnMovie/"
 	 var s2=document.getElementById('c1').value;
 	 var s3="/"
-     //alert(btnId);
+     //alert(s2);
 	 //var s4=document.getElementById('c2').value;
 	 document.getElementById('myform').action=s1.concat(s2,s3,btnId);
 	 document.getElementById('myform').submit();       
@@ -22,6 +22,7 @@ function val()
         <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
     </div>	
 </div>
+<form id="myform" name="myform" action="" method="post">
 <button type="button" class="btn btn-primary" onclick="val()">Return Movie<i class="icon-search"></i></button>
 <br>
 
@@ -43,5 +44,3 @@ function val()
         </div>
 <% });} %>
 </form>
-
-
