@@ -421,7 +421,16 @@ module.exports = function (app, passport) {
 
        });
        
+       app.get('/checkout/:id', isLoggedIn, function (req, res) {
 
+           connection.query(' select * from user_movie join user on user_movie.userId=user.userId join movies on user_movie.movieId=movies.id  where user_movie.userId="'+req.params.id+'"',function(err,joins){
+               	 if (err) {};
+               res.render('generateBill.ejs', {joins: joins});
+          
+           });
+
+       });
+       
        app.get('/issue/:id', isLoggedIn, function (req, res) {
        	connection.query('update movies set userId= "' +
                    req.params.id+ '")', function(err, rows, fields) {
