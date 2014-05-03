@@ -2,7 +2,7 @@
 <div style="padding:30px">
 </div>
 <div style=" width:500px;">
-<div  style="float:left; width:250px;">
+<div class="container" style="float:left; width:250px;">
 
 
     
@@ -12,7 +12,8 @@
 
 
     <form >
-        
+         <fieldset>
+         <legend> Purchase Information </legend>
                 <tbody align="left">
                 <tr>
                     <th style="width: 150px;">Member ID: </th>
@@ -55,7 +56,7 @@
            <h4> Total Rent is <%=sum%> </h4> 
             
             
-            
+        </fieldset>    
 
             
     </form>
@@ -147,7 +148,7 @@
           </div>
          
            <a href="/pay/<%= joins[0].userId %>" class="btn btn-primary">Pay</a>
-            <button type="button" class="btn">Cancel</button>
+            <a href="/profile/<%= joins[0].userId %>" class="btn btn-primary">Cancel</a>
          
         </fieldset>
       </form>

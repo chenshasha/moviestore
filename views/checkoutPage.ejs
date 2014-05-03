@@ -87,7 +87,8 @@
             </table>
             <table>
            <tr><td><a href="/issue/<%= joins[0].userId %>" class="btn btn-primary">Continue  </a></td>
-           <td> <a href="/checkout/<%= joins[0].userId %>" class="btn btn-primary">Generate Bill </a></td></tr> </table>
+           <td> <a href="/checkout/<%= joins[0].userId %>" class="btn btn-primary">Proceed with checkout </a></td>
+           <td> <a href="/profile/<%= joins[0].userId %>" class="btn btn-primary">Cancel </a></td></tr> </table>
           <td> <button type="button" class="btn">Cancel</button> </td>
         </div>  
         </div>
@@ -101,8 +102,9 @@
             
           
              <form >
+              <% joins.forEach( function ( joins ){ %>
         <div class="col-md-6 col-md-offset-3">
-         <% joins.forEach( function ( joins ){ %>
+       
             <table class="table table-bordered table-hover">
                
                 
@@ -136,16 +138,17 @@
                     <th style="width: 150px;">Category: </th>
                     <td><%= joins.category %></td>
                 </tr>
-
+ <tr><td> <a href="/removeMovie/<%= joins.id %>/<%= joins.userId %>" class="btn btn-primary">Remove </a></td></tr> 
                
 
                 </tbody>
             </table>
-           <% }); %>
+       
            
             
 
             </div>
+            <% }); %>
     </form>
 </div>
 </div>
