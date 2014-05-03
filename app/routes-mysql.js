@@ -200,7 +200,7 @@ module.exports = function (app, passport) {
 
 	//view individual profile
 	app.get('/profile/:id', isLoggedIn, function (req, res) {
-
+		
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			res.render('profile.ejs', {
@@ -260,6 +260,10 @@ module.exports = function (app, passport) {
 
 
 	});
+	
+	//app.get('/profile', isLoggedIn, function (req, res) {
+		//res.render('profile.ejs', {message: req.flash('noReturnMovie')}); // load the index.ejs file
+	//});
 //	****************************************************************************************
 //	Transaction Management
 //	***************************************************************************************
@@ -280,7 +284,7 @@ module.exports = function (app, passport) {
 					console.log(rows[0].availableCopy);
 					console.log(rows[0].userType);
 
-					if((rows[0].availableCopy <2 && rows[0].userType=="Simple" && rows[0].checkedOutCopy>0) )
+					if((rows[0].availableCopy <2 && rows[0].userType=="Simple" && rows[0].checkedOutCopy!=0) )
 					{
 						connection.query('update user set checkedOutCopy=checkedOutCopy-1, availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
 							if(err){console.log('unsuccessful update on user '+err);}
@@ -308,7 +312,7 @@ module.exports = function (app, passport) {
 					else{console.log('cannot add more copies');}
 
 
-					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy>0) )
+					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy!=0) )
 					{
 						connection.query('update user set checkedOutCopy=checkedOutCopy-1 ,availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
 							if(err){console.log('unsuccessful update on user '+err);}
@@ -335,7 +339,12 @@ module.exports = function (app, passport) {
 
 
 				});
-			}else{console.log('sorry no movie to return');}
+			}
+			else{
+				req.flash('no movies are issued');
+
+				
+			}
 		});
 	});
 
@@ -694,7 +703,21 @@ module.exports = function (app, passport) {
 		});
 
 	});
+	
+	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
+		connection.query('SELECT * FROM user_movie join movies on user_movie.movieId=movies.id  WHERE user_movie.userId = "' + req.params.id+'" and issueDate is not null', function(err, movies, fields) {
+			if (err) {};
+			if(movies.length!=0)
+			{
+				res.render('seeMoviesPage.ejs', {movies: movies});
+			}
+			else{console.log('no movies');  }
+		});
+
+	});
+
+	
 
 	//view individual movie 
 	app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
