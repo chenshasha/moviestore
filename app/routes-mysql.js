@@ -345,18 +345,14 @@ module.exports = function (app, passport) {
            });
           
 });
-       
-       
-       
-       
-       
-      
+         
        
        app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
        	var userid=req.params.uid;
        	var movieid=req.params.mid;
        	
        	connection.query('select availableCopy from user where userId="' +userid+ '"', function(err, rows, fields) {
+       		if(rows.length!=0){
        		if(rows[0].availableCopy > 0)
        			{
        				
@@ -384,53 +380,17 @@ module.exports = function (app, passport) {
        		else
        			{
        				console.log("Cannot Rent - Overlimit");
-       				/*var rent;
-       				connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {       							
-       							connection.query('insert into user_movie values("' +
-       	       	                req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+')', function(err, rows, fields) {
-       	       	       			if(err){console.log('unsuccessful insert');}
-       							});	
-       							rent=rows[0].RentAmount;
-       							console.log('Avail < 0 so rent '+rows[0].RentAmount);		
-       							connection.query('update user set checkedOutCopy=checkedOutCopy+1,balance=balance+'+rent+' where userId="'+req.params.uid+'"', function(err, rows, fields) {
-       	       	       	       	if(err){console.log('unsuccessful update'+err);}
-       	       	       	       	console.log('Avail < 0 so chk+1 and balance + '+rent);
-       	       	       	        });	
-       							connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
-       				       	    if(err){console.log('unsuccessful update on movies '+err);}
-       				       	    console.log('Movies avail - 1');
-       				       	    });	
-       				if(err){console.log('unsuccessful select');}
-       	         	});
-       				*/
+       				
        			}
-
-            });
-       	
-       	//check 1
-       	/*connection.query('select date_format(from_unixtime(expireDate),"%Y%m%d") as ed, curdate() as cd from user where userId="'+userid+'"', function(err, rows, fields) {
        		
-       	var ed=rows[0].ed;
-       		var cd=rows[0].cd;
-       		console.log(ed.getDate() +''+ cd.getDate());
-       		if(ed.getDate() > cd.getDate()){console.log('OK');}
+       		var pathName = '/checkoutPage/'+ userid;
+            res.redirect(pathName);
+       		}
+       		else{console.log('no movie was searched');}
             });
-       	//check 2
-       	*/
-       	
-      
-       	
-       	
-       	//console.log('insert user_movie values("' +
-          //      req.params.uid+ '",'+req.params.mid+')');
-       	//console.log('update movies set userId= "' +
-          //         req.params.uid+ '" where id='+req.params.mid+'');
-          // connection.query('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"', function(err, movies, fields) {
-               //if (err) {};
-              // console.log('SELECT * FROM user, movies where movies.userId="'+req.params.uid+'"');
-             //  console.log('uid='+req.params.uid+'mid='+req.params.mid);
-               var pathName = '/checkoutPage/'+ userid;
-               res.redirect(pathName);
+       	    	
+       
+               
            });
 
     
@@ -479,11 +439,14 @@ module.exports = function (app, passport) {
            connection.query(qry, function(err, movies, fields) {
                if (err) {
                };
+               if(movies.length!=0){
                var array = {id:req.params.id, firstName:req.params.name}
                console.log(array);
                res.render('issueMovie.ejs', {
                	user: array, searchres: movies
                });
+               }
+               else{console.log('no movie was searched');}
            });
 
        });
