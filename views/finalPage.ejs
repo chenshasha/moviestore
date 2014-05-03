@@ -11,7 +11,7 @@
 <div class="container" style="float:left;width:250px;" >
 
     <div class="page-header text-center">
-
+<h5>Bill</h5>
         <h4><span class="fa fa-anchor"></span>User Information</h4>
     </div>
 
@@ -22,73 +22,70 @@
                 <tbody style="text-align:left;">
                 <tr>
                     <th style="width: 150px;">Member ID: </th>
-                    <td><%= joins[0].userId %><br></td>
+                    <td><%= info[0].userId %><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Email: </th>
-                    <td><%= joins[0].email %><br></td>
+                    <td><%= info[0].email %><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Name: </th>
-                    <td><%=joins[0].firstName %> <%= joins[0].lastName %></td>
+                    <td><%=info[0].firstName %> <%= info[0].lastName %></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Phone Number: </th>
-                    <td><%= joins[0].phone %><br></td>
+                    <td><%= info[0].phone %><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Address: </th>
-                    <td><%= joins[0].address %></td>
+                    <td><%= info[0].address %></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">City: </th>
-                    <td><%= joins[0].city %></td>
+                    <td><%= info[0].city %></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">State: </th>
-                    <td><%= joins[0].state %></td>
+                    <td><%= info[0].state %></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Zip Code: </th>
-                    <td><%= joins[0].zipcode %></td>
+                    <td><%= info[0].zipcode %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Membership: </th>
-                    <td><%= joins[0].userType %></td>
+                    <td><%= info[0].userType %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Membership Start Date: </th>
-                    <td><%= joins[0].createDate %></td>
+                    <td><%= info[0].createDate %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Membership Expire Date: </th>
-                    <td><%= joins[0].expireDate %></td>
+                    <td><%= info[0].expireDate %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Checkout Copy: </th>
-                    <td><%= joins[0].checkedOutCopy %></td>
+                    <td><%= info[0].checkedOutCopy %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Available Copy: </th>
-                    <td><%= joins[0].availableCopy %></td>
+                    <td><%= info[0].availableCopy %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Balance: </th>
-                    <td><%= joins[0].balance %></td>
+                    <td><%= info[0].balance %></td>
                 </tr>
            
                 </tbody>
             </table>
-            <table>
-           <tr><td><a href="/issue/<%= joins[0].userId %>" class="btn btn-primary">Continue  </a></td>
-           <td> <a href="/checkout/<%= joins[0].userId %>" class="btn btn-primary">Generate Bill </a></td></tr> </table>
-          <td> <button type="button" class="btn">Cancel</button> </td>
+            
         </div>  
         </div>
         </div>
@@ -102,44 +99,47 @@
           
              <form >
         <div class="col-md-6 col-md-offset-3">
-         <% joins.forEach( function ( joins ){ %>
+         <% info.forEach( function ( info ){ %>
             <table class="table table-bordered table-hover">
                
                 
                 <tr>
                     <th style="width: 150px;">MovieID: </th>
-                    <td><%=joins.id%><br></td>
+                    <td><%=info.id%><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Movie Name: </th>
-                    <td><%=joins.MovieName%><br></td>
+                    <td><%=info.MovieName%><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Movie Banner: </th>
-                    <td><%= joins.MovieBanner %></td>
+                    <td><%= info.MovieBanner %></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Release Date: </th>
-                    <td><%= joins.ReleaseDate %><br></td>
+                    <td><%= info.ReleaseDate %><br></td>
                 </tr>
                 <tr>
                     <th style="width: 150px;">Rent Amount: </th>
-                    <td><%= joins.RentAmount %></td>
+                    <td><%= info.RentAmount %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Available Copies: </th>
-                    <td><%= joins.AvailableCopies %></td>
+                    <td><%= info.AvailableCopies %></td>
                 </tr>
 
                 <tr>
                     <th style="width: 150px;">Category: </th>
-                    <td><%= joins.category %></td>
+                    <td><%= info.category %></td>
                 </tr>
 
-               
+               <tr>
+                    <th style="width: 150px;">Issue Date: </th>
+                    <td><%= info.issueDate %></td>
+                </tr>
 
-                </tbody>
+               </tbody>
             </table>
            <% }); %>
            
