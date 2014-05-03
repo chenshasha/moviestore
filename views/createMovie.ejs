@@ -64,6 +64,7 @@
             </tbody>
         </table>
         <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn">Cancel</button>
 
 </form>
     </div>
@@ -92,7 +93,7 @@
      return false;
    }
    if( document.createForm.rentAmount.value == "" ||
-           isNaN( document.createForm.releaseDate.value ) )
+           isNaN( document.createForm.rentAmount.value ) )
    {
      alert( "Please provide rent amount!" );
      return false;

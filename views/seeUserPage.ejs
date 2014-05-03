@@ -1,0 +1,40 @@
+ <%- include adminheader %>
+ <div style="padding:30px">
+</div>
+         <div class="page-header text-center">
+
+        <h4><span class="fa fa-anchor"></span>users Information</h4>
+    </div> 
+         <div class="container"  >   
+          
+            
+          
+             <form >
+              <% users.forEach( function ( users){ %>
+        <div class="col-md-6 col-md-offset-3">
+       
+            <table class="table table-bordered table-hover">
+               
+                
+                
+                    <th style="width: 150px;">User name: </th>
+                    <td><%=users.firstName%><br></td><td><%=users.lastName%><br></td>
+                </tr>
+                <th style="width: 150px;">IssueDate </th>
+                    <td><%=users.issueDate%><br></td>
+                </tr>
+               <th style="width: 150px;">ReturnDate </th>
+                    <td><%=users.returnDate%><br></td>
+                </tr>
+
+                </tbody>
+            </table>
+       
+           
+            
+
+            </div>
+            <% }); %>
+    </form>
+</div>
+</div>
