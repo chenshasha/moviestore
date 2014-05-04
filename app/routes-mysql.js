@@ -436,7 +436,6 @@ module.exports = function (app, passport) {
 
 	});
 
-
 	app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
 		var userid=req.params.uid;
 		var movieid=req.params.mid;
