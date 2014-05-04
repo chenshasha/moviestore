@@ -51,6 +51,9 @@ require('./app/routes-mysql.js')(app, passport);
 //use caching
 //require('./app/routes-caching.js')(app, passport);
 
+//use connection pooling
+//require('./app/routes-pooling.js')(app, passport);
+
 
 // launch ======================================================================
 app.listen(port);
