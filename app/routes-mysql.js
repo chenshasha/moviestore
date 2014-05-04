@@ -204,7 +204,7 @@ module.exports = function (app, passport) {
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			res.render('profile.ejs', {
-				user: user[0]
+				user: user[0],message:req.flash('Error')
 			});
 
 		});
@@ -304,12 +304,17 @@ module.exports = function (app, passport) {
 							if(joins.length!=0){
 								res.render('returnContinue.ejs', {joins: joins});   
 							}
-							else{console.log('no movie to return');}
+							else{console.log('no movie to return');
+							req.flash('Error', 'No movies have been issued to this user');
+							res.redirect('/profile/'+userid);
+							}
 						});
 						//res.redirect('/checkoutPage/'+userid)
 
 					}
-					else{console.log('cannot add more copies');}
+					else{console.log('cannot add more copies');
+					req.flash('Error', 'Cannot add more copies');
+					res.redirect('/profile/'+userid);}
 
 
 					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy!=0) )
@@ -355,7 +360,10 @@ module.exports = function (app, passport) {
 			if(rows.length!=0){
 				res.render('returnMovie.ejs', {user: array, searchres: rows});
 			}
-			else{console.log('no movie checked out');}
+			else{console.log('no movie checked out');
+			req.flash('Error', 'No movies have been issued to this user');
+			res.redirect('/profile/'+req.params.uid);
+			}
 		});
 
 
@@ -464,6 +472,8 @@ module.exports = function (app, passport) {
 				else
 				{
 					console.log("Cannot Rent - Overlimit");
+					req.flash('Error', 'Cannot rent - User has reached his limit');
+					res.redirect('/profile/'+userid);
 
 				}
 
@@ -485,9 +495,11 @@ module.exports = function (app, passport) {
 
 			if (err) {};
 			if(joins.length!=0){
-				res.render('checkoutPage.ejs', {joins: joins});
+				res.render('checkoutPage.ejs', {joins: joins,message: req.flash('Error')});
 			}
 			else{console.log('no movies in the cart');  
+			req.flash('Error', 'No movies in the cart');
+			res.redirect('/profile/'+req.params.id);
 			// res.render('profile.ejs');}
 			}
 		});
@@ -507,9 +519,13 @@ module.exports = function (app, passport) {
 	app.get('/issue/:id', isLoggedIn, function (req, res) {
 
 
-		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+		connection.query('SELECT availableCopy FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
-			console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
+			if(user[0].availableCopy==0){
+				req.flash('Error', 'Cannot rent - User has reached his limit');
+				res.redirect('/profile/'+req.params.id);
+			}
+			//console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
 			res.render('issueMovie.ejs', {
 				user: user[0], searchres: ''
 			});
@@ -621,7 +637,7 @@ module.exports = function (app, passport) {
 	app.get('/searchMovieForMembers', function(req, res) {
 		console.log("in get");
 		connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
-
+			
 			res.render('searchMovieForMembers.ejs', {
 				movies: movies
 			});
@@ -725,13 +741,17 @@ module.exports = function (app, passport) {
 	
 	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
-		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="' + req.params.id+'" and issueDate is not null', function(err, movies, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
 			if (err) {};
 			if(movies.length!=0)
 			{
 				res.render('seeMoviesPage.ejs', {movies: movies});
 			}
-			else{console.log('no movies');  }
+			else{console.log('no movies');
+			req.flash('Error', 'No movies have been issued to this user');
+			res.redirect('/profile/'+req.params.id);
+			//return done(null, false, req.flash('message', 'no movies'));
+			}
 		});
 
 	});
@@ -811,6 +831,7 @@ module.exports = function (app, passport) {
 	var b;
 	var c;
 	var d;
+	var e;
 	app.get('/dashboard',isLoggedIn, function (req, res) {
 		connection.query('select count(*) as cnt from movies', function(err, rows1, fields) {  
 			a=rows1[0].cnt;
@@ -820,8 +841,11 @@ module.exports = function (app, passport) {
 					c=rows3[0].cnt;
 					connection.query('select count(*) as cnt from movies where AvailableCopies>0', function(err, rows4, fields) {
 						d=rows4[0].cnt;
-						if(!err){console.log('Dashboard Updated',a,b,c,d);}
-						res.render('MovieHome.ejs', { message: req.flash('loginMessage'),a: a, b: b, c: c, d: d });
+						connection.query('select MovieName, count(*) as cnt from user_movie join movies where movieId=id group by MovieName order by 2 desc limit 5;', function(err, rows5, fields) {
+							e=rows5;
+							if(!err){console.log('Dashboard Updated',a,b,c,d);}
+							res.render('MovieHome.ejs', { message: req.flash('loginMessage'),a: a, b: b, c: c, d: d, e: e });
+						});	
 					});	
 				});	
 			});	

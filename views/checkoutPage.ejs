@@ -3,9 +3,10 @@
 </div>
 <h4 align="center">CART</h4>
 <div style="width:500px;">
-
-
-        
+<!-- show any messages that come back with authentication -->
+<% if (message.length > 0) { %>
+	<div class="alert alert-danger"><%= message %></div>
+<% } %>
     
 <div style="float:left;width:250px;" >
 <div class="container" style="float:left;width:250px;" >
@@ -14,7 +15,7 @@
 
         <h4><span class="fa fa-anchor"></span>User Information</h4>
     </div>
-
+    
 
     <form >
         <div class="col-md-6 col-md-offset-3">

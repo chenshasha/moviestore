@@ -8,6 +8,10 @@
 
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
         </div>
+        <!-- show any messages that come back with authentication -->
+    	<% if (message.length > 0) { %>
+    		<div class="alert alert-danger"><%= message %></div>
+    	<% } %>
         <div class="col-sm-5 col-sm-offset-3" style="text-align: center;">
        
            <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
@@ -20,7 +24,7 @@
             
             <a href="/returnMovie/<%= user.userId %>/<%=user.firstName%>" class="btn btn-primary">Return Movie</a>
             
-            <a href="/checkoutPage/<%= user.userId %>" class="btn btn-primary">cart</a>
+            <a href="/checkoutPage/<%= user.userId %>" class="btn btn-primary">View Cart</a>
             
             <a href="/seeMovies/<%=user.userId %>" class="btn btn-primary">See the movies issued </a>
     </div>
