@@ -415,7 +415,7 @@ module.exports = function (app, passport) {
 				if(err){console.log('unsuccessful update in checking out'+err);}
 
 			});	
-			connection.query('update user_movie set issueDate=date_format(curdate(),"%Y-%m-%d") where userId="'+req.params.uid+'"', function(err, movies, fields) {
+			connection.query('update user_movie set issueDate=date_format(curdate(),"%Y-%m-%d") , inCart=false where userId="'+req.params.uid+'"', function(err, movies, fields) {
 				if (err) {};
 			});	
 			connection.query('select * from user_movie join movies on user_movie.movieId=movies.id join user on user.userId=user_movie.userId where user_movie.userId="'+req.params.uid+'" and issueDate=date_format(curdate(),"%Y-%m-%d")', function(err, info, fields) {
@@ -445,7 +445,7 @@ module.exports = function (app, passport) {
 					connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
 						var date= new Date();
 						connection.query('insert into user_movie values("' +
-								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL)', function(err, rows, fields) {
+								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL,true)', function(err, rows, fields) {
 							if(err){console.log('unsuccessful insert');}
 						});	
 						rent=rows[0].RentAmount;
@@ -481,7 +481,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join movies on movies.userId = user_movie.userId join user on user_movie.userId=user.userId where user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null', function(err, joins, fields) {
+		connection.query('SELECT * FROM user_movie join movies on movies.userId = user_movie.userId join user on user_movie.userId=user.userId where user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
 
 			if (err) {};
 			if(joins.length!=0){
@@ -542,10 +542,26 @@ module.exports = function (app, passport) {
 
 	// create movie 
 	app.get('/createMovie', isLoggedIn, function (req, res) {
-		res.render('createMovie.ejs'); // load the createMovie.ejs file
+		res.render('createMovie.ejs',{message: req.flash('movieDuplicate')}); // load the createMovie.ejs file
 	});
 	app.post('/createMovie', isLoggedIn, function (req, res) {
 
+		connection.query('SELECT * from movies WHERE MovieName = "' + req.param('movie_name')+'" and MovieBanner="'+req.param('banner')+'"', function(err, rows, fields) {
+			if (err) {
+			};
+			if(rows.length != 0){
+				//console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
+				console.log(rows);
+				//flash the message
+				req.flash('movieDuplicate', 'That movie exists already.');
+
+				res.render('createMovie.ejs', { message: req.flash('movieDuplicate') });
+
+			}else{
+		
+		
+		
+		
 		connection.query('select max(id) as id from movies',function(err, result,fields){	
 			//console.log(result[0].id);
 
@@ -572,7 +588,10 @@ module.exports = function (app, passport) {
 			});
 			var pathName = '/viewMoviePage/'+Id;
 			res.redirect(pathName);
+		
 		});
+			}
+	});
 	});
 
 //	***************************************************************
@@ -665,7 +684,7 @@ module.exports = function (app, passport) {
 				//flash the message
 				req.flash("No such Id', 'That id does not exist");
 
-				res.render('searchMovie.ejs', { message: req.flash('noid') });
+				//res.render('searchMovie.ejs', { message: req.flash('noid') });
 
 			}else{
 
@@ -788,7 +807,11 @@ module.exports = function (app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('adminlogin.ejs', { message: req.flash('loginMessage') });
 	});
-
+	app.get('/dashboard', function (req, res) {
+		// render the page and pass in any flash data if it exists
+		res.render('MovieHome.ejs', { message: req.flash('loginMessage') });
+	});
+	
 	// process the login form
 	app.post('/login', passport.authenticate('local-login', {
 		successRedirect: '/profile-view-only', // redirect to the secure profile section
@@ -798,7 +821,7 @@ module.exports = function (app, passport) {
 
 	app.post('/adminlogin', passport.authenticate('local-login',{
 
-		successRedirect: '/searchMember', // redirect to the secure profile section
+		successRedirect: '/dashboard', // redirect to the secure profile section
 		failureRedirect: '/adminlogin', // redirect back to the signup page if there is an error
 		failureFlash: true // allow flash messages
 
