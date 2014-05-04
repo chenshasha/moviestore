@@ -807,7 +807,7 @@ module.exports = function (app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('adminlogin.ejs', { message: req.flash('loginMessage') });
 	});
-	app.get('/dashboard', function (req, res) {
+	app.get('/dashboard',isLoggedIn, function (req, res) {
 		// render the page and pass in any flash data if it exists
 		res.render('MovieHome.ejs', { message: req.flash('loginMessage') });
 	});
