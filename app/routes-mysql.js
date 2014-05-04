@@ -508,7 +508,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkout/:id', isLoggedIn, function (req, res) {
 
-		connection.query(' select * from user_movie join user on user_movie.userId=user.userId join movies on user_movie.movieId=movies.id  where user_movie.userId="'+req.params.id+'" and user_movie.returnDate is NULL',function(err,joins){
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and user_movie.returnDate is NULL',function(err,joins){
 			if (err) {};
 			res.render('generateBill.ejs', {joins: joins});
 
@@ -517,9 +517,7 @@ module.exports = function (app, passport) {
 	});
 
 	app.get('/issue/:id', isLoggedIn, function (req, res) {
-
-
-		connection.query('SELECT availableCopy FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
+		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			if(user[0].availableCopy==0){
 				req.flash('Error', 'Cannot rent - User has reached his limit');
@@ -527,28 +525,36 @@ module.exports = function (app, passport) {
 			}
 			//console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
 			res.render('issueMovie.ejs', {
-				user: user[0], searchres: ''
+				user: user[0], searchres: '',message:req.flash('Error')
 			});
 
 		});
 
 	});
 	app.post('/issueSearch/:id/:name', isLoggedIn, function (req, res) {
-		var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'" and AvailableCopies >= 1';
+		var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+' and AvailableCopies > 0';
 		if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%" and AvailableCopies > 0';}
+		var array = {id:req.params.id, firstName:req.params.name}
+		//console.log(array);
 		connection.query(qry, function(err, movies, fields) {
 			if (err) {
 			};
 			if(movies.length!=0){
-				var array = {id:req.params.id, firstName:req.params.name}
-				console.log(array);
 				res.render('issueMovie.ejs', {
-					user: array, searchres: movies
+					user: array, searchres: movies, message:req.flash('Error')
 				});
 			}
-			else{console.log('no movie was searched');}
+			else{console.log('no movie was searched');
+			req.flash('Error', 'No movie found');
+			res.render('issueMovie.ejs', {
+				user: array, searchres: '', message:req.flash('Error')
+			});
+			}
 		});
 
+	});
+	app.get('/issueSearch/:id/:name', isLoggedIn, function (req, res) {		
+			res.redirect('/issueSearch/'+req.params.id+'/'+req.params.name);
 	});
 	//********************************************************************************************
 
@@ -697,16 +703,15 @@ module.exports = function (app, passport) {
 			if(movies.length === 0){
 				// console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
 				console.log('no id');
-				//flash the message
-				req.flash("No such Id', 'That id does not exist");
-
-				//res.render('searchMovie.ejs', { message: req.flash('noid') });
-
+				req.flash('Error', 'No movie found');
+				res.render('searchMovie.ejs', {
+					movies: movies, message:req.flash('Error')
+				});
 			}else{
 
 				console.log("in post");
 				res.render('searchMovie.ejs', {
-					movies: movies
+					movies: movies,message:req.flash('Error')
 				});
 			};
 		});
@@ -719,7 +724,7 @@ module.exports = function (app, passport) {
 		connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 
 			res.render('searchMovie.ejs', {
-				movies: movies
+				movies: movies, message:req.flash('Error')
 			});
 		});
 
@@ -734,7 +739,10 @@ module.exports = function (app, passport) {
 			{
 				res.render('seeUserPage.ejs', {users: users});
 			}
-			else{console.log('no users');  }
+			else{console.log('no users'); 
+			req.flash('Error', 'No users have issued this movie');
+			res.redirect('/viewMoviePage/'+req.params.id);
+			}
 		});
 
 	});
@@ -745,7 +753,7 @@ module.exports = function (app, passport) {
 			if (err) {};
 			if(movies.length!=0)
 			{
-				res.render('seeMoviesPage.ejs', {movies: movies});
+				res.render('seeMoviesPage.ejs', {movies: movies,user:req.params.id});
 			}
 			else{console.log('no movies');
 			req.flash('Error', 'No movies have been issued to this user');
@@ -763,7 +771,7 @@ module.exports = function (app, passport) {
 
 		connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
 			if (err) {};
-			res.render('viewMoviePage.ejs', {movies: movies[0]});
+			res.render('viewMoviePage.ejs', {movies: movies[0],message:req.flash('Error')});
 
 		});
 

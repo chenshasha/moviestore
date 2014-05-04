@@ -15,8 +15,6 @@ function val()
 }
 </script>
 
-<div style="padding:30px">
-</div>
 <div class="container">
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Issue Movie </h1>        
@@ -24,8 +22,12 @@ function val()
         <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
     </div>	
 </div>
+<!-- show any messages that come back with authentication -->
+    	<% if (message.length > 0) { %>
+    		<div class="alert alert-danger"><%= message %></div>
+    	<% } %>
 <label> Search Attribute </label>
-<form class="form-inline" role="form" method="post" action="/issueSearch/<%=user.userId%>/<%=user.firstName%>">
+<form class="form-inline" id="myform" name="myform" role="form" method="post" action="/issueSearch/<%=user.userId%>/<%=user.firstName%>">
   <select class="form-control" id="searchparam" name="searchparam">
                     <option value="id">id</option>
                     <option value="MovieName">MovieName</option>
@@ -40,10 +42,7 @@ function val()
     <input type="text" class="form-control" placeholder="Enter Search String" id="str" name="str">
   </div>
   &nbsp&nbsp&nbsp&nbsp
-  <button type="submit" class="btn btn-primary">Search<i class="icon-search"></i></button>
-</form>
-<form action="" id="myform" name="myform">
-&nbsp&nbsp&nbsp&nbsp
+  <button type="submit" class="btn btn-primary">Search<i class="icon-search"></i></button>&nbsp&nbsp&nbsp&nbsp
 <button type="button" class="btn btn-primary" onclick="val()">Issue Movie<i class="icon-search"></i></button>
 <br>
 
