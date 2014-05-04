@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 
 	host     : 'localhost',
 	user     : 'root',
-	password : '',
+	password : 'pass',
 	database : 'moviestore'
 });
 
@@ -269,11 +269,10 @@ module.exports = function (app, passport) {
 	app.post('/returnMovie/:uid/:mid', isLoggedIn, function (req, res) {
 		var userid=req.params.uid;
 		var movieid=req.params.mid;
-		console.log(userid);
+		console.log(userid+''+movieid);
 		connection.query('select * from user_movie where issueDate is not null',function(err, results){
 			if(results.length!=0)
 			{
-
 				connection.query('update movies set AvailableCopies=AvailableCopies+1  where id='+movieid, function(err, rows, fields) {
 					if(err){console.log('unsuccessful update on movies '+err);}
 					console.log('Movies avail + 1');
@@ -301,22 +300,16 @@ module.exports = function (app, passport) {
 							//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
 							if (err) {console.log('unsuccessful select on join '+err);}
 							if(joins.length!=0){
-								res.render('returnContinue.ejs', {joins: joins});   
+								req.flash('Success', 'Movie returned Successfully');
+								res.render('returnContinue.ejs', {joins: joins, message: req.flash('Success')});   
 							}
 							else{console.log('no movie to return');
 							req.flash('Error', 'No movies have been issued to this user');
 							res.redirect('/profile/'+userid);
 							}
 						});
-						//res.redirect('/checkoutPage/'+userid)
-
 					}
-					else{console.log('cannot add more copies');
-					req.flash('Error', 'Cannot add more copies');
-					res.redirect('/profile/'+userid);}
-
-
-					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy!=0) )
+					else if((rows[0].availableCopy <10 && rows[0].userType=="Premium" && rows[0].checkedOutCopy!=0) )
 					{
 						connection.query('update user set checkedOutCopy=checkedOutCopy-1 ,availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
 							if(err){console.log('unsuccessful update on user '+err);}
@@ -334,20 +327,20 @@ module.exports = function (app, passport) {
 							//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
 							if (err) {console.log('unsuccessful select on join '+err);}
 							if(joins.length!=0){
-								res.render('returnContinue.ejs', {joins: joins});   
+								req.flash('Success', 'Movie returned Successfully');
+								res.render('returnContinue.ejs', {joins: joins, message: req.flash('Success')});   
 							}
 							else{console.log('no movie to return');}
 						});
 					}
-					else{console.log('cannot add more copies');}
-
-
+					else{console.log('cannot add more copies');
+					req.flash('Error', 'Cannot add more copies');
+					res.redirect('/profile/'+userid);}
 				});
 			}
 			else{
-				req.flash('no movies are issued');
-
-				
+				console.lg('no movies are issued');
+				req.flash('no movies are issued');				
 			}
 		});
 	});
@@ -364,8 +357,6 @@ module.exports = function (app, passport) {
 			res.redirect('/profile/'+req.params.uid);
 			}
 		});
-
-
 	});
 	// Remove movie from the cart before checking out
 
@@ -785,7 +776,7 @@ module.exports = function (app, passport) {
 	
 	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
-		connection.query('select * from user_movie  join movies where user_movie.movieId=movies.id and user_movie.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
+		connection.query('select * from user_movie join movies where user_movie.movieId=movies.id and user_movie.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
 			if (err) {};
 			if(movies.length!=0)
 			{

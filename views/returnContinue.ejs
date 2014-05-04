@@ -12,7 +12,10 @@
 
         <h6><span class="fa fa-anchor"></span>User Information</h6>
     </div>
-
+<!-- show any messages that come back with authentication -->
+    	<% if (message.length > 0) { %>
+    		<div class="alert alert-success"><%= message %></div>
+    	<% } %>
 
     <form >
         <div class="col-md-6 col-md-offset-3">
