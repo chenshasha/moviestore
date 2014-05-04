@@ -6,7 +6,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'root',
-	password : '',
+	password : 'pass',
 	database : 'moviestore'
 });
 
