@@ -298,7 +298,7 @@ module.exports = function (app, passport) {
 							if(err){console.log('unsuccessful update on user_movie'+err);}
 							console.log('userid set null');
 						});
-						connection.query('SELECT * FROM user_movie join movies on movies.id = user_movie.movieId join user on user_movie.userId=user.userId where user_movie.userId="'+userid+'" and returnDate=date_format(curdate(),"%Y-%m-%d")', function(err, joins, fields) {
+						connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true and returnDate=date_format(curdate(),"%Y-%m-%d")', function(err, joins, fields) {
 							//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
 							if (err) {console.log('unsuccessful select on join '+err);}
 							if(joins.length!=0){
@@ -362,9 +362,9 @@ module.exports = function (app, passport) {
 	});
 	// Remove movie from the cart before checking out
 
-	app.get('/removeMovie/:mid/:id', isLoggedIn, function (req, res) {
+	app.get('/removeMovie/:mid/:id/:ukey', isLoggedIn, function (req, res) {
 		var userid=req.params.id;
-		connection.query('delete from user_movie where movieId='+req.params.mid+'', function(err, rows, fields) {
+		connection.query('delete from user_movie where movieId='+req.params.mid+' and uniquekey='+req.params.ukey, function(err, rows, fields) {
 			if(err){console.log('unsuccessful delete');}
 
 		});
@@ -444,7 +444,7 @@ module.exports = function (app, passport) {
 					connection.query('update movies set userId="'+req.params.uid+'" where id='+req.params.mid+'',function(err,result){if(err){console.log('error in updating userid in movies');}});
 					connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
 						var date= new Date();
-						connection.query('insert into user_movie values("' +
+						connection.query('insert into user_movie(userId,movieId,rent,returnDate,issueDate,inCart) values("' +
 								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL,true)', function(err, rows, fields) {
 							if(err){console.log('unsuccessful insert');}
 						});	
@@ -481,7 +481,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join movies on movies.userId = user_movie.userId join user on user_movie.userId=user.userId where user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
 
 			if (err) {};
 			if(joins.length!=0){
@@ -712,7 +712,7 @@ module.exports = function (app, passport) {
 
 	app.get('/seeUsers/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join user on user_movie.userId=user.userId  WHERE user_movie.movieId = ' + req.params.id+' and issueDate is not null', function(err, users, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and movies.id=' + req.params.id+' and issueDate is not null', function(err, users, fields) {
 			if (err) {};
 			if(users.length!=0)
 			{
@@ -725,7 +725,7 @@ module.exports = function (app, passport) {
 	
 	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join movies on user_movie.movieId=movies.id  WHERE user_movie.userId = "' + req.params.id+'" and issueDate is not null', function(err, movies, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="' + req.params.id+'" and issueDate is not null', function(err, movies, fields) {
 			if (err) {};
 			if(movies.length!=0)
 			{
@@ -807,9 +807,26 @@ module.exports = function (app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('adminlogin.ejs', { message: req.flash('loginMessage') });
 	});
+	var a;
+	var b;
+	var c;
+	var d;
 	app.get('/dashboard',isLoggedIn, function (req, res) {
+		connection.query('select count(*) as cnt from movies', function(err, rows1, fields) {  
+			a=rows1[0].cnt;
+			connection.query('select count(*) as cnt from user', function(err, rows2, fields) {
+				b=rows2[0].cnt;
+				connection.query('select count(*) as cnt from movies where AvailableCopies=0', function(err, rows3, fields) {
+					c=rows3[0].cnt;
+					connection.query('select count(*) as cnt from movies where AvailableCopies>0', function(err, rows4, fields) {
+						d=rows4[0].cnt;
+						if(!err){console.log('Dashboard Updated',a,b,c,d);}
+						res.render('MovieHome.ejs', { message: req.flash('loginMessage'),a: a, b: b, c: c, d: d });
+					});	
+				});	
+			});	
+		});
 		// render the page and pass in any flash data if it exists
-		res.render('MovieHome.ejs', { message: req.flash('loginMessage') });
 	});
 	
 	// process the login form
