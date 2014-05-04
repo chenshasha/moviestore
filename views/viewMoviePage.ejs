@@ -37,11 +37,7 @@ function confirmDeletion() {
 	<% if (message.length > 0) { %>
 		<div class="alert alert-danger"><%= message %></div>
 	<% } %>
-    <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
-    <a href="/modifyMovie/<%= movies.id %>" class="btn btn-primary">Modify Movie</a>
-    <a href="/seeUsers/<%= movies.id %>" class="btn btn-primary">Users who have issued this Movie</a>
-     <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
-     </div>
+   
     <form >
         <div class="col-md-6 col-md-offset-3">
             <table class="table table-bordered table-hover">
@@ -89,6 +85,13 @@ function confirmDeletion() {
 
 
             </div>
+            
+            
+             <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
+    <a href="/modifyMovie/<%= movies.id %>" class="btn btn-primary">Modify Movie</a>
+    <a href="/seeUsers/<%= movies.id %>" class="btn btn-primary">Users who have issued this Movie</a>
+     <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
+     </div>
     </form>
 
 

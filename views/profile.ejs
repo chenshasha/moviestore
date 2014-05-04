@@ -15,7 +15,7 @@
     	<% if (message.length > 0) { %>
     		<div class="alert alert-danger"><%= message %></div>
     	<% } %>
-        <div class="col-sm-5 col-sm-offset-3" style="text-align: center;">
+        <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
        
            <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
         
@@ -24,7 +24,10 @@
             <a href="/changeMembership/<%= user.userId %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
 
             <a href="/issue/<%= user.userId %>" class="btn btn-primary">Issue Movie</a><br>
+            </div>
+            <br> <br> 
             
+        <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
             <a href="/returnMovie/<%= user.userId %>/<%=user.firstName%>" class="btn btn-primary">Return Movie</a>
             
             <a href="/checkoutPage/<%= user.userId %>" class="btn btn-primary">View Cart</a>
@@ -32,7 +35,8 @@
             <a href="/seeMovies/<%=user.userId %>" class="btn btn-primary">See the movies issued </a>
     </div>
 
-
+<br>
+<br>
     <form >
         <div class="col-md-6 col-md-offset-3">
             <table class="table table-bordered table-hover">
