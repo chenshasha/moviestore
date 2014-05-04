@@ -1,4 +1,29 @@
 <%- include adminheader %>
+<link href="/bootstrap.css" rel="stylesheet">
+<script type="text/javascript">
+function confirmDeletion() {
+ 
+  var confirmmessage = "Are you sure you want to delete?";
+ 
+  var message = "Action Was Cancelled By User";
+ 
+  if (confirm(confirmmessage)) {
+      alert("Movie Deleted ");
+      window.location = "/deleteMovie/<%= movies.id %>"
+ 
+  } else {
+ 
+       alert(message);
+ 
+  }
+ 
+}
+</script>
+
+
+
+<body>
+
 <div style="padding:30px">
 </div>
 
@@ -66,22 +91,4 @@
 
 </div>
 
-<script type="text/javascript">
-function confirmDeletion() {
- 
-  var confirmmessage = "Are you sure you want to delete?";
- 
-  var message = "Action Was Cancelled By User";
- 
-  if (confirm(confirmmessage)) {
-      alert("Movie Deleted ");
-      window.location = "/deleteMovie/<%= movies.id %>"
- 
-  } else {
- 
-       alert(message);
- 
-  }
- 
-}
-</script>
+</body>

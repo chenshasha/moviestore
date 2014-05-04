@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 
 	host     : 'localhost',
 	user     : 'root',
-	password : 'pass',
+	password : 'anshul21',
 	database : 'moviestore'
 });
 

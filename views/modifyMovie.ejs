@@ -1,6 +1,56 @@
 <%- include adminheader %>
+<html>
+<head>
 
+<link href="/bootstrap.css" rel="stylesheet">
 
+ <script type="text/javascript">
+    function validateForm()
+{ if( document.createForm.movie_name.value == "" )
+   {
+     alert( "Please provide movie name!" );
+     document.createForm.movie_name.focus() ;
+     return false;
+   }
+   if( document.createForm.banner.value == "" )
+   {
+     alert( "Please provide movie banner!" );
+     document.createForm.banner.focus() ;
+     return false;
+   }
+   if( document.createForm.releaseDate.value == "" ||
+           isNaN( document.createForm.releaseDate.value ) ||
+           document.createForm.releaseDate.value.length != 4 )
+   {
+     alert( "Please provide a release date in the format of year." );
+     document.createForm.releaseDate.focus() ;
+     return false;
+   }
+   if( document.createForm.rentAmount.value == "" ||
+           isNaN( document.createForm.releaseDate.value ) )
+   {
+     alert( "Please provide rent amount!" );
+     return false;
+   }
+    if( document.createForm.category.value == "")
+   {
+     alert( "Please provide category of movie!" );
+     return false;
+   }
+    if( document.createForm.availableCopies.value == "" ||
+           isNaN( document.createForm.availableCopies.value ) )
+   {
+     alert( "Please provide number of copies available!" );
+     return false;
+   }
+  
+   return( true );
+}
+</script>
+
+</head>
+
+<body>
 <div style="padding:30px">
 </div>
 <div class="container">
@@ -51,47 +101,9 @@
         <button type="submit" class="btn btn-primary">Submit</button>
         <a href="/viewMoviePage/<%= movies.id %>" class="btn btn-primary">Cancel  </a>
         
-        <script type="text/javascript">
-    function validateForm()
-{ if( document.createForm.movie_name.value == "" )
-   {
-     alert( "Please provide movie name!" );
-     document.createForm.movie_name.focus() ;
-     return false;
-   }
-   if( document.createForm.banner.value == "" )
-   {
-     alert( "Please provide movie banner!" );
-     document.createForm.banner.focus() ;
-     return false;
-   }
-   if( document.createForm.releaseDate.value == "" ||
-           isNaN( document.createForm.releaseDate.value ) ||
-           document.createForm.releaseDate.value.length != 4 )
-   {
-     alert( "Please provide a release date in the format of year." );
-     document.createForm.releaseDate.focus() ;
-     return false;
-   }
-   if( document.createForm.rentAmount.value == "" ||
-           isNaN( document.createForm.releaseDate.value ) )
-   {
-     alert( "Please provide rent amount!" );
-     return false;
-   }
-    if( document.createForm.category.value == "")
-   {
-     alert( "Please provide category of movie!" );
-     return false;
-   }
-    if( document.createForm.availableCopies.value == "" ||
-           isNaN( document.createForm.availableCopies.value ) )
-   {
-     alert( "Please provide number of copies available!" );
-     return false;
-   }
-  
-   return( true );
-}
-</script>
+       
 </form>
+
+</body>
+
+</html>
