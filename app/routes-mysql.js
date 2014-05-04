@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 
 	host     : 'localhost',
 	user     : 'root',
-	password : 'anshul21',
+	password : '',
 	database : 'moviestore'
 });
 
@@ -401,12 +401,50 @@ module.exports = function (app, passport) {
 
 	app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
-			if (err) {};
-			//console.log('uid='+uid+'mid='+mid);
+		var userid=req.params.uid;
+		var movieid=req.params.mid;
 
-			//res.render('viewMoviePage.ejs', {movies: movies[0]});
+		connection.query('select availableCopy from user where userId="' +userid+ '"', function(err, rows, fields) {
+			if(rows.length!=0){
+				if(rows[0].availableCopy > 0)
+				{
+
+					var rent;
+					connection.query('update movies set userId="'+req.params.uid+'" where id='+req.params.mid+'',function(err,result){if(err){console.log('error in updating userid in movies');}});
+					connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
+						var date= new Date();
+						connection.query('insert into user_movie(userId,movieId,rent,returnDate,issueDate,inCart) values("' +
+								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL,true)', function(err, rows, fields) {
+							if(err){console.log('unsuccessful insert');}
+						});	
+						rent=rows[0].RentAmount;
+						console.log('Avail < 0 so rent '+rows[0].RentAmount);		
+						connection.query('update user set  availableCopy=availableCopy-1 , balance=balance+'+rent+' where userId="'+req.params.uid+'"', function(err, rows, fields) {
+							if(err){console.log('unsuccessful update'+err);}
+							console.log('Avail < 0 so chk+1 and balance + '+rent);
+						});	
+						connection.query('update movies set AvailableCopies=AvailableCopies-1 where id='+req.params.mid, function(err, rows, fields) {
+							if(err){console.log('unsuccessful update on movies '+err);}
+							console.log('Movies avail - 1');
+						});	
+						if(err){console.log('unsuccessful select');}
+					});
+				}
+				else
+				{
+					console.log("Cannot Rent - Overlimit");
+					req.flash('Error', 'Cannot rent - User has reached his limit');
+					res.redirect('/profile/'+userid);
+
+				}
+
+				var pathName = '/checkoutPage/'+ userid;
+				res.redirect(pathName);
+			}
+			else{console.log('no movie was searched');}
 		});
+
+
 
 	});      
 
@@ -425,7 +463,7 @@ module.exports = function (app, passport) {
 			connection.query('update user_movie set issueDate=date_format(curdate(),"%Y-%m-%d") , inCart=false where userId="'+req.params.uid+'"', function(err, movies, fields) {
 				if (err) {};
 			});	
-			connection.query('select * from user_movie join movies on user_movie.movieId=movies.id join user on user.userId=user_movie.userId where user_movie.userId="'+req.params.uid+'" and issueDate=date_format(curdate(),"%Y-%m-%d")', function(err, info, fields) {
+			connection.query('select * from user_movie join movies on user_movie.movieId=movies.id join user on user.userId=user_movie.userId where user_movie.userId="'+req.params.uid+'" and issueDate=date_format(curdate(),"%Y-%m-%d") and returnDate is null', function(err, info, fields) {
 				if (err) {};
 				if(info.length!=0)
 				{
@@ -489,7 +527,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-		connection.query('select * from user_movie  join movies where user_movie.movieId=movies.id and user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
+		connection.query('select * from user_movie  join movies join user where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
 
 			if (err) {};
 			if(joins.length!=0){
