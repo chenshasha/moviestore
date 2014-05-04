@@ -7,7 +7,13 @@
         <h1><span class="fa fa-anchor"></span> Create Movie</h1>
     </div>
 
+ <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
 
+    <% if (message.length > 0) { %>
+    <div class="alert alert-danger"><%= message %></div>
+    <% } %>
+
+    </div>
 
 <form action="/createMovie" method="post" accept-charset="utf-8" name="createForm" onsubmit="return (validateForm());">
     <div class="col-md-6 col-md-offset-3">
@@ -64,7 +70,7 @@
             </tbody>
         </table>
         <button type="submit" class="btn btn-primary">Submit</button>
-        <button type="button" class="btn">Cancel</button>
+        <td> <a href="/dashboard" class="btn btn-primary">Cancel </a></td></tr> </table>
 
 </form>
     </div>

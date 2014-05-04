@@ -1,23 +1,28 @@
 <%- include adminheader %>
 <div style="padding:30px">
-</div>
+
 
 <div class="container">
 
     <div class="page-header text-center">
 
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
-        <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
+        </div>
+        <div class="col-sm-5 col-sm-offset-3" style="text-align: center;">
+       
+           <a href="/modifyprofile/<%= user.userId %>" class="btn btn-primary">Modify Profile  </a>
         
             <a href="/destroy/<%= user.userId %>"  class="btn btn-primary">Delete Member</a>
 
             <a href="/changeMembership/<%= user.userId %>/<%= user.userType %>" class="btn btn-primary">Change Membership  </a>
 
-            <a href="/issue/<%= user.userId %>" class="btn btn-primary">Issue Movie</a>
+            <a href="/issue/<%= user.userId %>" class="btn btn-primary">Issue Movie</a><br>
             
             <a href="/returnMovie/<%= user.userId %>/<%=user.firstName%>" class="btn btn-primary">Return Movie</a>
             
             <a href="/checkoutPage/<%= user.userId %>" class="btn btn-primary">cart</a>
+            
+            <a href="/seeMovies/<%=user.userId %>" class="btn btn-primary">See the movies issued </a>
     </div>
 
 

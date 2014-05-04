@@ -1,0 +1,41 @@
+ <%- include adminheader %>
+ <div style="padding:30px">
+</div>
+         <div class="page-header text-center">
+
+        <h4><span class="fa fa-anchor"></span>Movies Information</h4>
+    </div> 
+         <div class="container"  >   
+          
+            
+          
+             <form >
+              <% movies.forEach( function ( movies){ %>
+        <div class="col-md-6 col-md-offset-3">
+       
+            <table class="table table-bordered table-hover">
+               
+                
+                
+                    <th style="width: 150px;">Movie Name: </th>
+                    <td><%=movies.MovieName%><br></td>
+                </tr>
+                </tr>
+                <th style="width: 150px;">IssueDate </th>
+                    <td><%=movies.issueDate%><br></td>
+                </tr>
+               <th style="width: 150px;">ReturnDate </th>
+                    <td><%=movies.returnDate%><br></td>
+                </tr>
+               
+                </tbody>
+            </table>
+       
+           
+            
+
+            </div>
+            <% }); %>
+    </form>
+</div>
+</div>

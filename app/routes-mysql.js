@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 
 	host     : 'localhost',
 	user     : 'root',
-	password : '',
+	password : 'pass',
 	database : 'moviestore'
 });
 
@@ -201,7 +201,7 @@ module.exports = function (app, passport) {
 
 	//view individual profile
 	app.get('/profile/:id', isLoggedIn, function (req, res) {
-
+		
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			res.render('profile.ejs', {
@@ -261,6 +261,10 @@ module.exports = function (app, passport) {
 
 
 	});
+	
+	//app.get('/profile', isLoggedIn, function (req, res) {
+		//res.render('profile.ejs', {message: req.flash('noReturnMovie')}); // load the index.ejs file
+	//});
 //	****************************************************************************************
 //	Transaction Management
 //	***************************************************************************************
@@ -281,7 +285,7 @@ module.exports = function (app, passport) {
 					console.log(rows[0].availableCopy);
 					console.log(rows[0].userType);
 
-					if((rows[0].availableCopy <2 && rows[0].userType=="Simple" && rows[0].checkedOutCopy>0) )
+					if((rows[0].availableCopy <2 && rows[0].userType=="Simple" && rows[0].checkedOutCopy!=0) )
 					{
 						connection.query('update user set checkedOutCopy=checkedOutCopy-1, availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
 							if(err){console.log('unsuccessful update on user '+err);}
@@ -295,7 +299,7 @@ module.exports = function (app, passport) {
 							if(err){console.log('unsuccessful update on user_movie'+err);}
 							console.log('userid set null');
 						});
-						connection.query('SELECT * FROM user_movie join movies on movies.id = user_movie.movieId join user on user_movie.userId=user.userId where user_movie.userId="'+userid+'" and returnDate=date_format(curdate(),"%Y-%m-%d")', function(err, joins, fields) {
+						connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true and returnDate=date_format(curdate(),"%Y-%m-%d")', function(err, joins, fields) {
 							//console.log('SELECT * FROM user join movies on movies.userId = user.userId where user.userId="'+userid+'"');
 							if (err) {console.log('unsuccessful select on join '+err);}
 							if(joins.length!=0){
@@ -309,7 +313,7 @@ module.exports = function (app, passport) {
 					else{console.log('cannot add more copies');}
 
 
-					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy>0) )
+					if((rows[0].availableCopy <10 && rows[0].userType=="premium" && rows[0].checkedOutCopy!=0) )
 					{
 						connection.query('update user set checkedOutCopy=checkedOutCopy-1 ,availableCopy=availableCopy+1 where userId="'+userid+'"', function(err, rows, fields) {	
 							if(err){console.log('unsuccessful update on user '+err);}
@@ -336,7 +340,12 @@ module.exports = function (app, passport) {
 
 
 				});
-			}else{console.log('sorry no movie to return');}
+			}
+			else{
+				req.flash('no movies are issued');
+
+				
+			}
 		});
 	});
 
@@ -354,9 +363,9 @@ module.exports = function (app, passport) {
 	});
 	// Remove movie from the cart before checking out
 
-	app.get('/removeMovie/:mid/:id', isLoggedIn, function (req, res) {
+	app.get('/removeMovie/:mid/:id/:ukey', isLoggedIn, function (req, res) {
 		var userid=req.params.id;
-		connection.query('delete from user_movie where movieId='+req.params.mid+'', function(err, rows, fields) {
+		connection.query('delete from user_movie where movieId='+req.params.mid+' and uniquekey='+req.params.ukey, function(err, rows, fields) {
 			if(err){console.log('unsuccessful delete');}
 
 		});
@@ -407,7 +416,7 @@ module.exports = function (app, passport) {
 				if(err){console.log('unsuccessful update in checking out'+err);}
 
 			});	
-			connection.query('update user_movie set issueDate=date_format(curdate(),"%Y-%m-%d") where userId="'+req.params.uid+'"', function(err, movies, fields) {
+			connection.query('update user_movie set issueDate=date_format(curdate(),"%Y-%m-%d") , inCart=false where userId="'+req.params.uid+'"', function(err, movies, fields) {
 				if (err) {};
 			});	
 			connection.query('select * from user_movie join movies on user_movie.movieId=movies.id join user on user.userId=user_movie.userId where user_movie.userId="'+req.params.uid+'" and issueDate=date_format(curdate(),"%Y-%m-%d")', function(err, info, fields) {
@@ -436,8 +445,8 @@ module.exports = function (app, passport) {
 					connection.query('update movies set userId="'+req.params.uid+'" where id='+req.params.mid+'',function(err,result){if(err){console.log('error in updating userid in movies');}});
 					connection.query('select RentAmount from movies where id='+req.params.mid, function(err, rows, fields) {  
 						var date= new Date();
-						connection.query('insert into user_movie values("' +
-								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL)', function(err, rows, fields) {
+						connection.query('insert into user_movie(userId,movieId,rent,returnDate,issueDate,inCart) values("' +
+								req.params.uid+ '",'+req.params.mid+','+rows[0].RentAmount+',NULL,NULL,true)', function(err, rows, fields) {
 							if(err){console.log('unsuccessful insert');}
 						});	
 						rent=rows[0].RentAmount;
@@ -473,7 +482,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join movies on movies.userId = user_movie.userId join user on user_movie.userId=user.userId where user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null', function(err, joins, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
 
 			if (err) {};
 			if(joins.length!=0){
@@ -534,10 +543,26 @@ module.exports = function (app, passport) {
 
 	// create movie 
 	app.get('/createMovie', isLoggedIn, function (req, res) {
-		res.render('createMovie.ejs'); // load the createMovie.ejs file
+		res.render('createMovie.ejs',{message: req.flash('movieDuplicate')}); // load the createMovie.ejs file
 	});
 	app.post('/createMovie', isLoggedIn, function (req, res) {
 
+		connection.query('SELECT * from movies WHERE MovieName = "' + req.param('movie_name')+'" and MovieBanner="'+req.param('banner')+'"', function(err, rows, fields) {
+			if (err) {
+			};
+			if(rows.length != 0){
+				//console.log('SELECT * from user WHERE email = "' + req.param('email')+'"');
+				console.log(rows);
+				//flash the message
+				req.flash('movieDuplicate', 'That movie exists already.');
+
+				res.render('createMovie.ejs', { message: req.flash('movieDuplicate') });
+
+			}else{
+		
+		
+		
+		
 		connection.query('select max(id) as id from movies',function(err, result,fields){	
 			//console.log(result[0].id);
 
@@ -564,7 +589,10 @@ module.exports = function (app, passport) {
 			});
 			var pathName = '/viewMoviePage/'+Id;
 			res.redirect(pathName);
+		
 		});
+			}
+	});
 	});
 
 //	***************************************************************
@@ -657,7 +685,7 @@ module.exports = function (app, passport) {
 				//flash the message
 				req.flash("No such Id', 'That id does not exist");
 
-				res.render('searchMovie.ejs', { message: req.flash('noid') });
+				//res.render('searchMovie.ejs', { message: req.flash('noid') });
 
 			}else{
 
@@ -685,7 +713,7 @@ module.exports = function (app, passport) {
 
 	app.get('/seeUsers/:id', isLoggedIn, function (req, res) {
 
-		connection.query('SELECT * FROM user_movie join user on user_movie.userId=user.userId  WHERE user_movie.movieId = ' + req.params.id+' and issueDate is not null', function(err, users, fields) {
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and movies.id=' + req.params.id+' and issueDate is not null', function(err, users, fields) {
 			if (err) {};
 			if(users.length!=0)
 			{
@@ -695,7 +723,21 @@ module.exports = function (app, passport) {
 		});
 
 	});
+	
+	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
+		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="' + req.params.id+'" and issueDate is not null', function(err, movies, fields) {
+			if (err) {};
+			if(movies.length!=0)
+			{
+				res.render('seeMoviesPage.ejs', {movies: movies});
+			}
+			else{console.log('no movies');  }
+		});
+
+	});
+
+	
 
 	//view individual movie 
 	app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
@@ -766,7 +808,28 @@ module.exports = function (app, passport) {
 		// render the page and pass in any flash data if it exists
 		res.render('adminlogin.ejs', { message: req.flash('loginMessage') });
 	});
-
+	var a;
+	var b;
+	var c;
+	var d;
+	app.get('/dashboard',isLoggedIn, function (req, res) {
+		connection.query('select count(*) as cnt from movies', function(err, rows1, fields) {  
+			a=rows1[0].cnt;
+			connection.query('select count(*) as cnt from user', function(err, rows2, fields) {
+				b=rows2[0].cnt;
+				connection.query('select count(*) as cnt from movies where AvailableCopies=0', function(err, rows3, fields) {
+					c=rows3[0].cnt;
+					connection.query('select count(*) as cnt from movies where AvailableCopies>0', function(err, rows4, fields) {
+						d=rows4[0].cnt;
+						if(!err){console.log('Dashboard Updated',a,b,c,d);}
+						res.render('MovieHome.ejs', { message: req.flash('loginMessage'),a: a, b: b, c: c, d: d });
+					});	
+				});	
+			});	
+		});
+		// render the page and pass in any flash data if it exists
+	});
+	
 	// process the login form
 	app.post('/login', passport.authenticate('local-login', {
 		successRedirect: '/profile-view-only', // redirect to the secure profile section
@@ -776,7 +839,7 @@ module.exports = function (app, passport) {
 
 	app.post('/adminlogin', passport.authenticate('local-login',{
 
-		successRedirect: '/searchMember', // redirect to the secure profile section
+		successRedirect: '/dashboard', // redirect to the secure profile section
 		failureRedirect: '/adminlogin', // redirect back to the signup page if there is an error
 		failureFlash: true // allow flash messages
 
