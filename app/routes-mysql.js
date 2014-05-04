@@ -6,7 +6,7 @@ var mysql = require('../node_modules/mysql');
 var connection = mysql.createConnection({
 	host     : 'localhost',
 	user     : 'root',
-	password : 'pass',
+	password : '',
 	database : 'moviestore'
 });
 
@@ -261,9 +261,7 @@ module.exports = function (app, passport) {
 
 	});
 	
-	//app.get('/profile', isLoggedIn, function (req, res) {
-		//res.render('profile.ejs', {message: req.flash('noReturnMovie')}); // load the index.ejs file
-	//});
+	
 //	****************************************************************************************
 //	Transaction Management
 //	***************************************************************************************
@@ -404,7 +402,7 @@ module.exports = function (app, passport) {
 
 		connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
 			if (err) {};
-			console.log('uid='+uid+'mid='+mid);
+			//console.log('uid='+uid+'mid='+mid);
 
 			//res.render('viewMoviePage.ejs', {movies: movies[0]});
 		});
@@ -491,7 +489,7 @@ module.exports = function (app, passport) {
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
 
-		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
+		connection.query('select * from user_movie  join movies where user_movie.movieId=movies.id and user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is  null and inCart=true;', function(err, joins, fields) {
 
 			if (err) {};
 			if(joins.length!=0){
@@ -749,7 +747,7 @@ module.exports = function (app, passport) {
 	
 	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
 
-		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
+		connection.query('select * from user_movie  join movies where user_movie.movieId=movies.id and user_movie.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
 			if (err) {};
 			if(movies.length!=0)
 			{
