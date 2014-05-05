@@ -4,6 +4,10 @@
 <script>
 function val()
 {
+if ($('input[name=Rad]:checked').length == 0) {
+    alert('Please select a movie');
+    return false;
+}
 	 var btnId = $('input[name=Rad]:checked').attr('id');
 	 var s1="/issueMovie/"
 	 var s2=document.getElementById('c1').value;
@@ -23,15 +27,13 @@ function val()
 <div style="padding:30px">
 </div>
 
-<div style="padding:30px">
-</div>
 <div class="container">
     <div class="page-header text-center">
         <h1><span class="fa fa-anchor"></span> Issue Movie </h1>        
         Welcome <%=user.firstName%>
         <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
     </div>	
-</div>
+
 <!-- show any messages that come back with authentication -->
     	<% if (message.length > 0) { %>
     		<div class="alert alert-danger"><%= message %></div>
@@ -54,7 +56,7 @@ function val()
   &nbsp&nbsp&nbsp&nbsp
   <button type="submit" class="btn btn-primary">Search<i class="icon-search"></i></button>&nbsp&nbsp&nbsp&nbsp
 <button type="button" class="btn btn-primary" onclick="val()">Issue Movie<i class="icon-search"></i></button>
-<br>
+<br><br>
 
     <%
     if (searchres!='')
@@ -74,6 +76,6 @@ function val()
         </div>
 <% });} %>
 </form>
-
+</div>
 </body>
 </html>

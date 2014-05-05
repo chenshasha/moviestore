@@ -10,23 +10,33 @@
 
 <div style="padding:30px">
 </div>
-<h4 align="center">CART</h4>
+<h4 align="center">BILL INVOICE - Order Id <%= info[0].orderId %><br><br>
+<% var totr=0; info.forEach( function ( info ){ 
+  totr=totr+info.RentAmount }); %>
+ Total Rent is <%=totr%> 
+        <% if (info[0].userType=="Premium"){%>
+           + Monthly Subscription fees $10
+           <%}%></h4>
+
+
+
 <div style="width:500px;">
 
 
         
     
 <div style="float:left;width:250px;" >
-<div class="container" style="float:left;width:250px;" >
+<div class="container"  style="float:left;width:250px;">
 
-    <div class="page-header text-center">
-<h5>Bill</h5>
-        <h4><span class="fa fa-anchor"></span>User Information</h4>
-    </div>
+    
 
 
     <form >
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-12 col-md-offset-6">
+        <div class="page-header text-center">
+        <h4><span class="fa fa-anchor"></span>User Information</h4>
+        
+    </div>
             <table class="table table-bordered table-hover">
                 <tbody style="text-align:left;">
                 <tr>
@@ -100,15 +110,17 @@
         </div>
         <div style="float:right;width:250px;" >
          <div class="container"  >   
-           <div class="page-header text-center">
-
-        <h4><span class="fa fa-anchor"></span>Movie Information</h4>
-    </div>
+           
             
           
              <form >
         <div class="col-md-6 col-md-offset-3">
-         <% info.forEach( function ( info ){ %>
+        <div class="page-header text-center">
+
+        <h4><span class="fa fa-anchor"></span>Movie Information</h4>
+    </div>
+         <% var totrent=0;var i=0; info.forEach( function ( info ){ %>
+         <h4><span class="fa fa-anchor"></span>Movie <%= ++i %></h4>
             <table class="table table-bordered table-hover">
                
                 
@@ -131,6 +143,7 @@
                 <tr>
                     <th style="width: 150px;">Rent Amount: </th>
                     <td><%= info.RentAmount %></td>
+                    <% totrent=totrent+info.RentAmount %>
                 </tr>
 
                 <tr>
@@ -151,7 +164,9 @@
                </tbody>
             </table>
            <% }); %>
-           
+           <% if (info[0].balance > totrent){%>
+           <h2> Monthly Subscription fees $10 for Premium member added to bill </h2>
+           <%}%>
             
 
             </div>

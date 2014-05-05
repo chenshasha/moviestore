@@ -46,13 +46,13 @@ mongoose.connect(configDB.url); // connect to our database
 var db = mongoose.connection;
 
 ////use mysql
-require('./app/routes-mysql.js')(app, passport);
+//require('./app/routes-mysql.js')(app, passport);
 
 //use caching
 //require('./app/routes-caching.js')(app, passport);
 
 //use connection pooling
-//require('./app/routes-pooling.js')(app, passport);
+require('./app/routes-pooling.js')(app, passport);
 
 
 // launch ======================================================================

@@ -11,7 +11,11 @@
 
         <h1><span class="fa fa-anchor"></span> Profile Page</h1>
     </div>
-
+    
+<!-- show any messages that come back with authentication -->
+    	<% if (message.length > 0) { %>
+    		<div class="alert alert-danger"><%= message %></div>
+    	<% } %>
 
     <form >
         <div class="col-md-6 col-md-offset-3">
@@ -81,6 +85,11 @@
             </div>
     </form>
 
+<div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
+       
+           <a href="/seeMovieForMembers/<%= user.userId %>" class="btn btn-primary">See Movies Issued </a>
+        
+            </div>
 
 </div>
 
