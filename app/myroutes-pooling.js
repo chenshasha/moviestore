@@ -3,17 +3,23 @@ var User = require('../app/models/user');
 var Movie = require('../app/models/movie');
 
 var mysql = require('../node_modules/mysql');
-var connection = mysql.createConnection({
-
-	host     : 'localhost',
-	user     : 'root',
-	password : '',
-	database : 'moviestore'
+var pool = mysql.createPool({
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'moviestore'
 });
 
 
 module.exports = function (app, passport) {
+	pool.getConnection(function (err, connection) {
+
 	connection.connect();
+	
+	connection.release();
+    if (err) throw err;
+});
+
 
 
 //	****************************************************************
@@ -26,6 +32,8 @@ module.exports = function (app, passport) {
 	});
 
 	app.post('/addMember', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		//check whether same email exist
 		connection.query('SELECT * from user WHERE email = "' + req.param('email')+'"', function(err, rows, fields) {
 			if (err) {
@@ -105,6 +113,9 @@ module.exports = function (app, passport) {
 		});
 
 
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
@@ -113,6 +124,7 @@ module.exports = function (app, passport) {
 	//search members based on attributes
 	app.post('/searchMember', isLoggedIn, function (req, res) {
 
+	pool.getConnection(function (err, connection) {
 
 		connection.query('SELECT * from user WHERE ' + req.param('searchparam') + ' = "' + req.param('str')+'"', function(err, users, fields) {
 			if (err) {
@@ -122,11 +134,16 @@ module.exports = function (app, passport) {
 				users: users
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
 	//change Membership -- Simple User: 1 year validation, Premium User: 1 month validation
 	app.get('/changeMembership/:id/:type', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
 
 		var today = new Date();
 		var memberDay = new Date();
@@ -182,12 +199,19 @@ module.exports = function (app, passport) {
 		req.flash('Error','Membership changed');
 		var pathName = pathName = '/profile/'+ req.params.id;
 		res.redirect(pathName);
+		connection.release();
+        if (err) throw err;
+    });
 
+		
+		
 	});
 
 
 	//member view profile
 	app.get('/profile-view-only', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 		console.log('SELECT * from user WHERE userId = "' + req.session.userId + '"');
 		connection.query('SELECT * from user WHERE userId = "' + req.session.userId + '"', function(err, user, fields) {
 
@@ -195,12 +219,19 @@ module.exports = function (app, passport) {
 				user : user[0], message:req.flash('Error')
 			});
 		});
+		
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
 
 	//view individual profile
 	app.get('/profile/:id', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 		
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
@@ -210,11 +241,18 @@ module.exports = function (app, passport) {
 
 		});
 
+		connection.release();
+        if (err) throw err;
+    });
+		
+		
 	});
 
 
 	//modify profile
 	app.get('/modifyprofile/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
@@ -223,11 +261,16 @@ module.exports = function (app, passport) {
 			});
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 	});
 
 
 	app.post('/modifyprofile/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('UPDATE user SET firstName = "' + req.param('firstName')
 				+ '", lastName = "' + req.param('lastName') + '", address = "'+ req.param('address')
@@ -239,18 +282,30 @@ module.exports = function (app, passport) {
 		req.flash('Error','Member Profile Modified');
 		var pathName = '/profile/'+ req.params.id;
 		res.redirect(pathName);
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 
 	//delete individual member
 	app.get('/destroy/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		User.remove({"local.userId": req.params.id}).exec();
 		connection.query('DELETE FROM user WHERE userId = "'+ req.params.id + '"');
 		res.redirect('/searchMember');
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 
 
 	//search members
 	app.get('/searchMember', function(req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * from user', function(err, users, fields) {
 
@@ -258,6 +313,9 @@ module.exports = function (app, passport) {
 				users: users
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
@@ -267,6 +325,8 @@ module.exports = function (app, passport) {
 //	Transaction Management
 //	***************************************************************************************
 	app.post('/returnMovie/:uid/:mid/:ukey', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var userid=req.params.uid;
 		var movieid=req.params.mid;
 		if (movieid==undefined || userid==undefined){
@@ -356,9 +416,15 @@ module.exports = function (app, passport) {
 				res.redirect('/profile/'+userid);
 			}
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 
 	app.get('/returnMovie/:uid/:name', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		console.log('in retrun get');
 		var array = {id:req.params.uid, firstName:req.params.name};
 		connection.query('select * from user_movie um join movies m where um.movieId=m.id and returnDate is  NULL and issueDate is not Null and um.userId="'+req.params.uid+'"', function(err, rows, fields) {
@@ -371,10 +437,16 @@ module.exports = function (app, passport) {
 			res.redirect('/profile/'+req.params.uid);
 			}
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 	// Remove movie from the cart before checking out
 
 	app.get('/removeMovie/:mid/:id/:ukey', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var userid=req.params.id;
 		connection.query('delete from user_movie where movieId='+req.params.mid+' and uniquekey='+req.params.ukey, function(err, rows, fields) {
 			if(err){console.log('unsuccessful delete');}
@@ -403,12 +475,17 @@ module.exports = function (app, passport) {
 		});
 		var pathName = '/profile/'+ userid;
 		res.redirect(pathName);
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
 
 
 	app.post('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		var userid=req.params.uid;
 		var movieid=req.params.mid;
@@ -464,12 +541,17 @@ module.exports = function (app, passport) {
 			}
 		});
 
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});      
 
 //	Checking out the movies in the cart
 	app.get('/pay/:uid', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		connection.query('select sum(rent) as totalRent , count(movieId) as total from user_movie where userId="'+req.params.uid+'" and issueDate is NULL', function(err, rows, fields) {  
 			if (err) {console.log('unsuccessful select of sum of rent');}
 			var bal=rows[0].totalRent;
@@ -496,10 +578,16 @@ module.exports = function (app, passport) {
 				else {console.log('no movie matched');}
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
 	app.get('/issueMovie/:uid/:mid', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var userid=req.params.uid;
 		var movieid=req.params.mid;
 		
@@ -546,6 +634,9 @@ module.exports = function (app, passport) {
 			res.redirect('/issue/'+userid);}
 		});
 
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
@@ -553,6 +644,8 @@ module.exports = function (app, passport) {
 
 
 	app.get('/checkoutPage/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('select * from user_movie join movies join user where user_movie.movieId=movies.id and user.userId=user_movie.userId and user_movie.userId="'+req.params.id+'" and returnDate is NULL and issueDate is NULL and inCart=true', function(err, joins, fields) {
 
@@ -566,20 +659,33 @@ module.exports = function (app, passport) {
 			// res.render('profile.ejs');}
 			}
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
 	app.get('/checkout/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and user.userId=movies.userId and user.userId="'+req.params.id+'" and user_movie.returnDate is NULL and inCart=true',function(err,joins){
 			if (err) {};
 			res.render('generateBill.ejs', {joins: joins});
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
+
 
 	});
 
 	app.get('/issue/:id', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			
@@ -594,9 +700,15 @@ module.exports = function (app, passport) {
 			});
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 	app.post('/issueSearch/:id/:name', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+' and AvailableCopies > 0';
 		if(req.param('searchparam')=='MovieName' || req.param('searchparam')=='MovieBanner' || req.param('searchparam')=='category'){qry='SELECT * from movies WHERE ' + req.param('searchparam') + ' like "%' + req.param('str')+'%" and AvailableCopies > 0';}
 		var array = {id:req.params.id, firstName:req.params.name}
@@ -623,6 +735,10 @@ module.exports = function (app, passport) {
 			}
 			
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 	app.get('/issueSearch/:id/:name', isLoggedIn, function (req, res) {		
@@ -639,6 +755,8 @@ module.exports = function (app, passport) {
 		res.render('createMovie.ejs',{message: req.flash('movieDuplicate')}); // load the createMovie.ejs file
 	});
 	app.post('/createMovie', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * from movies WHERE MovieName = "' + req.param('movie_name')+'" and MovieBanner="'+req.param('banner')+'"', function(err, rows, fields) {
 			if (err) {
@@ -686,20 +804,32 @@ module.exports = function (app, passport) {
 		});
 			}
 	});
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 
 //	***************************************************************
 
 	//delete individual movie 
 	app.get('/deleteMovie/:id', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 
 		connection.query('DELETE FROM movies WHERE id = '+ req.params.id);
 		req.flash('Error','Movie Deleted successfully');
 		res.redirect('/dashboard');
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 	//***************************************************************
 	//Search movie for members
 	app.post('/searchMovieForMembers', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 		if(req.param('str')==""){
 			req.flash('Error','Please enter search criteria');
 			res.redirect('/searchMovieForMembers');
@@ -721,9 +851,14 @@ module.exports = function (app, passport) {
 				movies: movies, message: req.flash('Error')
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 	});
 	app.get('/searchMovieForMembers', function(req, res) {
+	pool.getConnection(function (err, connection) {
+
 		console.log("in get");
 		connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 			
@@ -731,11 +866,16 @@ module.exports = function (app, passport) {
 				movies: movies, message: req.flash('Error')
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
 	
 	app.get('/seeMovieForMembers/:id', function(req, res) {
+	pool.getConnection(function (err, connection) {
+
 		connection.query('select coalesce(user_movie.returnDate,"Not Returned") as "returnDate",movies.MovieName,user_movie.issueDate from user_movie join movies where user_movie.movieId=movies.id and user_movie.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
 			if (err) {console.log('query unsuccessful')};
 			if(movies.length!=0)
@@ -748,7 +888,9 @@ module.exports = function (app, passport) {
 			//return done(null, false, req.flash('message', 'no movies'));
 			}
 		});
-
+		connection.release();
+        if (err) throw err;
+    });
 
 	});
 
@@ -757,12 +899,18 @@ module.exports = function (app, passport) {
 	//view For members
 
 	app.get('/movie-view-only/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
 			if (err) {};
 			res.render('movie-view-only.ejs', {movies: movies[0]});
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
@@ -771,6 +919,8 @@ module.exports = function (app, passport) {
 
 	//view all movies
 	app.get('/movieall/:cnt',isLoggedIn, function(req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var low=0;
 		low=(req.params.cnt * 20) - 20;
 		connection.query('SELECT * from movies limit '+low+', 20', function(err, movies, fields) {
@@ -778,6 +928,10 @@ module.exports = function (app, passport) {
 			//GLOBAL.count=GLOBAL.count+1;
 			res.render('movie.ejs', {movies: movies ,cnt: req.params.cnt});
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 
 
@@ -790,6 +944,8 @@ module.exports = function (app, passport) {
 
 	//serch movies for admin 
 	app.post('/searchMovie', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		//connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
 		var qry= 'SELECT * from movies WHERE ' + req.param('searchparam') + ' = ' + req.param('str')+'';
 
@@ -822,10 +978,15 @@ module.exports = function (app, passport) {
 				});
 			};
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
 	app.get('/searchMovie', function(req, res) {
+		pool.getConnection(function (err, connection) {
+
 		console.log("in get");
 
 		connection.query('SELECT * from movies limit 10', function(err, movies, fields) {
@@ -834,11 +995,16 @@ module.exports = function (app, passport) {
 				movies: movies, message:req.flash('Error')
 			});
 		});
+		connection.release();
+        if (err) throw err;
+    });
 
 
 	});
 
 	app.get('/seeUsers/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('select * from user_movie join user join movies where user_movie.movieId=movies.id and movies.id=' + req.params.id+' and issueDate is not null', function(err, users, fields) {
 			if (err) {};
@@ -851,10 +1017,16 @@ module.exports = function (app, passport) {
 			res.redirect('/viewMoviePage/'+req.params.id);
 			}
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 	
 	app.get('/seeMovies/:id', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 
 		connection.query('select * from user_movie join movies where user_movie.movieId=movies.id and user_movie.userId="' + req.params.id+'" and issueDate is not null and returnDate is NULL', function(err, movies, fields) {
 			if (err) {};
@@ -868,6 +1040,10 @@ module.exports = function (app, passport) {
 			//return done(null, false, req.flash('message', 'no movies'));
 			}
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
@@ -875,18 +1051,27 @@ module.exports = function (app, passport) {
 
 	//view individual movie 
 	app.get('/viewMoviePage/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * FROM movies WHERE id = ' + req.params.id, function(err, movies, fields) {
 			if (err) {};
 			res.render('viewMoviePage.ejs', {movies: movies[0],message:req.flash('Error')});
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
+
 
 	});
 //	***************************************************************
 	//modify movie
 
 	app.get('/modifyMovie/:id', isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 
 		connection.query('SELECT * FROM movies WHERE id = '+ req.params.id , function(err, movies, fields) {
 			if (err) {};
@@ -896,10 +1081,16 @@ module.exports = function (app, passport) {
 
 
 		});
+		connection.release();
+        if (err) throw err;
+    });
+
 
 	});
 
 	app.post('/modifyMovie/:id', isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 
 		var movie_id=req.params.id;
 		var name=req.param('movie_name');
@@ -915,6 +1106,11 @@ module.exports = function (app, passport) {
 		req.flash('Error','Movie Modified');
 		var pathName = '/viewMoviePage/'+ movie_id;
 		res.redirect(pathName);
+		connection.release();
+        if (err) throw err;
+    });
+
+
 	});
 
 
@@ -944,6 +1140,8 @@ module.exports = function (app, passport) {
 	});
 	
 	app.get('/dashboard',isLoggedIn, function (req, res) {
+	pool.getConnection(function (err, connection) {
+
 		var a;
 		var b;
 		var c;
@@ -967,9 +1165,15 @@ module.exports = function (app, passport) {
 			});	
 		});
 		// render the page and pass in any flash data if it exists
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 	
 	app.get('/dashboardMember',isLoggedIn, function (req, res) {
+		pool.getConnection(function (err, connection) {
+
 		var a;
 		var b;
 		var c;
@@ -993,6 +1197,10 @@ module.exports = function (app, passport) {
 			});	
 		});
 		// render the page and pass in any flash data if it exists
+		connection.release();
+        if (err) throw err;
+    });
+
 	});
 	
 	// process the login form

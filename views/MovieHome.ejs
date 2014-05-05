@@ -71,7 +71,8 @@
         chart.write("chartdiv");
     });
 </script>
-  </head>
+
+      </head>
 <div class="container">
   <body background="Sfondo.jpg">
 
@@ -86,6 +87,10 @@
           <div id="chartdiv" style="width:600px; height:400px;"></div>
           </div>
             <h1><font color="BLACK" NINJA MOVIESTORE> <small>Statistics Overview</small> </font></h1>
+            <!-- show any messages that come back with authentication -->
+        	<% if (message.length > 0) { %>
+        		<div class="alert alert-success"><%= message %></div>
+        	<% } %>
             <ol class="breadcrumb" style="width:500px">
               <li class="active"><i class="fa fa-dashboard"></i> Project Developed by:</li>
             </ol>
@@ -98,10 +103,10 @@
               
               <br>Gaurav Shiralkar
               <br>Deepna Bains
-              <br>Shasha
-              <br>Yuan
-              <br>Anshul
-              <br>Abhijeet</h4>
+              <br>Shasha Chen
+              <br>Yuan Cao
+              <br>Anshul Sharma
+              <br>Abhijeet Limaye</h4>
             </div>
           </div>
         </div><!-- /.row -->

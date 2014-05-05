@@ -9,7 +9,8 @@ function confirmDeletion() {
  
   if (confirm(confirmmessage)) {
       alert("Movie Deleted ");
-      window.location = "/deleteMovie/<%= movies.id %>"
+      document.getElementById('myform').action= = "/deleteMovie/<%= movies.id %>";
+	  document.getElementById('myform').submit();
  
   } else {
  
@@ -38,7 +39,7 @@ function confirmDeletion() {
 		<div class="alert alert-danger"><%= message %></div>
 	<% } %>
    
-    <form >
+    <form name="myform" id="myform" method="get">
         <div class="col-md-6 col-md-offset-3">
             <table class="table table-bordered table-hover">
                 <tbody style="text-align:left;">
@@ -90,7 +91,7 @@ function confirmDeletion() {
              <div class="col-sm-6 col-sm-offset-3" style="text-align: center;">
     <a href="/modifyMovie/<%= movies.id %>" class="btn btn-primary">Modify Movie</a>
     <a href="/seeUsers/<%= movies.id %>" class="btn btn-primary">Users who have issued this Movie</a>
-     <a href="#" onClick="confirmDeletion()"  class="btn btn-primary">Delete Movie</a>
+     <a href="/deleteMovie/<%= movies.id %>" onClick=""  class="btn btn-primary">Delete Movie</a>
      </div>
     </form>
 
