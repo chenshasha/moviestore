@@ -3,13 +3,20 @@
 <script>
 function val()
 {
+if ($('input[name=Rad]:checked').length == 0) {
+    alert('Please select a movie');
+    return false;
+}
 	 var btnId = $('input[name=Rad]:checked').attr('id');
+	 var btnId1 = $('input[name=Rad]:checked').attr('value');
+	 //alert(btnId1);
 	 var s1="/returnMovie/"
 	 var s2=document.getElementById('c1').value;
-	 var s3="/"
+	 var s3="/";
+	 var s4="/";
      //alert(s2);
 	 //var s4=document.getElementById('c2').value;
-	 document.getElementById('myform').action=s1.concat(s2,s3,btnId);
+	 document.getElementById('myform').action=s1.concat(s2,s3,btnId,s4,btnId1);
 	 document.getElementById('myform').submit();       
 }
 </script>
@@ -22,6 +29,11 @@ function val()
         Welcome <%=user.firstName%>
         <input type="hidden" value="<%=user.id%>" id="c1" name="<%=user.id%>">
     </div>	
+    
+<!-- show any messages that come back with authentication -->
+    	<% if (message.length > 0) { %>
+    		<div class="alert alert-success"><%= message %></div>
+    	<% } %>
 
 <form id="myform" name="myform" action="" method="post">
 <button type="button" class="btn btn-primary" onclick="val()">Return Movie<i class="icon-search"></i></button><br>
@@ -38,7 +50,7 @@ function val()
             	<div>Id: <%= searchres.id %></div>
             	<div class="radio">
                 <label>
-                <input type="radio" id="<%=searchres.id%>" value="<%=searchres.id%>" name="Rad"> Select movie
+                <input type="radio" id="<%=searchres.id%>" value="<%=searchres.uniquekey%>" name="Rad"> Select movie
                 </label>
                 </div>
             </div>        

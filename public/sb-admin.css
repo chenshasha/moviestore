@@ -68,7 +68,7 @@ table.tablesorter thead {
 }
 
 table.tablesorter thead tr th:hover {
-  background-color: #f5f5f5;
+  background-color: 003300;
 }
 
 /* Flot Chart Containers */
