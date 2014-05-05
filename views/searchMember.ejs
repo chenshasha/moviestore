@@ -36,20 +36,20 @@
                 $("#str").removeAttr('title');
             }
             else if($('#searchparam').val() == "state"){
-                $("#str").removeAttr('pattern');
-                $("#str").removeAttr('pattern');
+                $("#str").attr('pattern', '[A-Z]{2}|[a-z]{2}');
+                $("#str").attr('title', 'Please enter valid State Abbreviation');
             }
             else if($('#searchparam').val() == "firstName"){
                 $("#str").removeAttr('pattern');
-                $("#str").removeAttr('pattern');
+                $("#str").removeAttr('title');
             }
             else if($('#searchparam').val() == "lastName"){
                 $("#str").removeAttr('pattern');
-                $("#str").removeAttr('pattern');
+                $("#str").removeAttr('title');
             }
             else if($('#searchparam').val() == "userType"){
                 $("#str").removeAttr('pattern');
-                $("#str").removeAttr('pattern');
+                $("#str").removeAttr('title');
             }
 
         });
