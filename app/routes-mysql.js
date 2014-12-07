@@ -7,7 +7,7 @@ var connection = mysql.createConnection({
 
 	host     : 'localhost',
 	user     : 'root',
-	password : '',
+	password : 'pass',
 	database : 'moviestore'
 });
 
@@ -205,7 +205,7 @@ module.exports = function (app, passport) {
 		connection.query('SELECT * FROM user WHERE userId = "' + req.params.id + '"', function(err, user, fields) {
 			if (err) {};
 			res.render('profile.ejs', {
-				user: user[0],message:req.flash('Msg')
+				user: user[0],message:req.flash('Error')
 			});
 
 		});
@@ -585,7 +585,7 @@ module.exports = function (app, passport) {
 			
 			if(user[0].availableCopy===0){
 				console.log('redirected to profile'+ user[0].availableCopy);
-				req.flash('Msg','User has reached his limit');
+				req.flash('Error','User has reached his limit');
 				res.redirect('/profile/'+req.params.id);
 			}
 			//console.log('SELECT * FROM user WHERE userId = "' + req.params.id + '"');
